@@ -1,4 +1,9 @@
+'use client';
+
 import { Button } from '@/components/livekit/button';
+import Link from 'next/link';
+import { LayoutGrid, BarChart3, Target, Phone } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 function WelcomeImage() {
   return (
@@ -23,23 +28,61 @@ interface WelcomeViewProps {
   onStartCall: () => void;
 }
 
+const quickLinks = [
+  { icon: LayoutGrid, label: 'Dashboard', path: '/', description: 'View your stats and analytics' },
+  { icon: Phone, label: 'Voice Agent', path: '/dashboard/agent', description: 'Start a voice session' },
+  { icon: Target, label: 'Training', path: '/dashboard/training', description: 'Practice your skills' },
+  { icon: BarChart3, label: 'Analytics', path: '/dashboard/analytics', description: 'Track your progress' },
+];
+
 export const WelcomeView = ({
   startButtonText,
   onStartCall,
   ref,
 }: React.ComponentProps<'div'> & WelcomeViewProps) => {
   return (
-    <div ref={ref}>
-      <section className="bg-background flex flex-col items-center justify-center text-center">
+    <div ref={ref} className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center">
+      <section className="bg-background flex flex-col items-center justify-center text-center max-w-4xl mx-auto px-6">
         <WelcomeImage />
 
-        <p className="text-foreground max-w-prose pt-1 leading-6 font-medium">
-          Chat live with your voice AI agent
+        <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+          Voice AI Agent Platform
+        </h1>
+
+        <p className="text-foreground max-w-prose pt-1 leading-6 font-medium mb-8">
+          Chat live with your voice AI agent and improve your communication skills
         </p>
 
-        <Button variant="primary" size="lg" onClick={onStartCall} className="mt-6 w-64 font-mono">
+        <Button variant="primary" size="lg" onClick={onStartCall} className="mb-12 w-64 font-mono">
           {startButtonText}
         </Button>
+
+        {/* Quick Navigation Links */}
+        <div className="w-full mt-8">
+          <h2 className="text-lg font-semibold text-foreground mb-4">Quick Access</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {quickLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.path}
+                  href={link.path}
+                  className={cn(
+                    'flex flex-col items-center gap-2 p-4 rounded-lg border border-border',
+                    'bg-card hover:bg-muted transition-colors',
+                    'text-center group'
+                  )}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <Icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <span className="font-medium text-foreground">{link.label}</span>
+                  <span className="text-xs text-muted-foreground">{link.description}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
       </section>
     </div>
   );
