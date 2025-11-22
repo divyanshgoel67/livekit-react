@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { DashboardSidebar } from '@/components/dashboard/sidebar';
 import { SessionView } from '@/components/app/session-view';
 import { StartAudio, RoomAudioRenderer } from '@livekit/components-react';
@@ -11,7 +12,14 @@ import Link from 'next/link';
 import type { AppConfig } from '@/app-config';
 
 export function VoiceAgentContent({ appConfig }: { appConfig: AppConfig }) {
+  const router = useRouter();
   const { isSessionActive, startSession, endSession } = useSession();
+
+  // Handle disconnect - redirect to dashboard home
+  const handleDisconnect = () => {
+    endSession();
+    router.push('/');
+  };
 
   return (
     <>
@@ -48,7 +56,7 @@ export function VoiceAgentContent({ appConfig }: { appConfig: AppConfig }) {
             </div>
           ) : (
             <div className="h-screen">
-              <SessionView appConfig={appConfig} className="h-full w-full" />
+              <SessionView appConfig={appConfig} className="h-full w-full" onDisconnect={handleDisconnect} />
             </div>
           )}
         </main>

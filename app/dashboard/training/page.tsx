@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { DashboardSidebar } from '@/components/dashboard/sidebar';
 import { PersonaSection } from '@/components/dashboard/persona-section';
 import { RecentAttemptRow } from '@/components/dashboard/recent-attempt-row';
@@ -21,6 +22,7 @@ import {
   hardPersonas,
   recentHistory,
 } from '@/lib/training-data';
+import { useTrainingStore } from '@/store/training-store';
 
 const MotionSessionView = motion.create(SessionView);
 
@@ -43,10 +45,25 @@ const VIEW_MOTION_PROPS = {
 };
 
 export default function TrainingPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'simulation' | 'analytics'>('simulation');
-  const [selectedPersona, setSelectedPersona] = useState<number | null>(1);
   const [showLiveKit, setShowLiveKit] = useState(false);
-  const { appConfig, isSessionActive, startSession } = useSession();
+  const { appConfig, isSessionActive, startSession, endSession } = useSession();
+  const { selectedPersona, setSelectedPersona } = useTrainingStore();
+
+  // Initialize with first persona if none selected
+  useEffect(() => {
+    if (!selectedPersona && lastPlayedPersonas.length > 0) {
+      setSelectedPersona(lastPlayedPersonas[0]);
+    }
+  }, [selectedPersona, setSelectedPersona]);
+
+  // Handle disconnect - redirect to dashboard home
+  const handleDisconnect = () => {
+    endSession();
+    setShowLiveKit(false);
+    router.push('/');
+  };
 
   // Show LiveKit interface when showLiveKit is true
   if (showLiveKit) {
@@ -57,6 +74,7 @@ export default function TrainingPage() {
             key="session-view"
             {...VIEW_MOTION_PROPS}
             appConfig={appConfig}
+            onDisconnect={handleDisconnect}
           />
         </div>
         <StartAudio label="Start Audio" />
@@ -158,6 +176,7 @@ export default function TrainingPage() {
               <Button
                 size="lg"
                 onClick={() => {
+                  console.log('🚀 Starting simulation with persona:', selectedPersona);
                   setShowLiveKit(true);
                   startSession();
                 }}

@@ -7,8 +7,8 @@ import type { Persona } from '@/lib/training-data';
 interface PersonaSectionProps {
   title: string;
   personas: Persona[];
-  selectedPersona: number | null;
-  onPersonaSelect: (id: number) => void;
+  selectedPersona: Persona | null;
+  onPersonaSelect: (persona: Persona) => void;
   showCreateCustom?: boolean;
 }
 
@@ -28,8 +28,8 @@ export function PersonaSection({
           <PersonaCard
             key={persona.id}
             {...persona}
-            selected={selectedPersona === persona.id}
-            onClick={() => onPersonaSelect(persona.id)}
+            selected={selectedPersona?.id === persona.id}
+            onClick={() => onPersonaSelect(persona)}
           />
         ))}
       </div>

@@ -47,7 +47,7 @@ export function PersonaCard({
         <div className="p-4 space-y-2">
           <div>
             <h3 className="font-bold text-foreground mb-1">Name: {name}</h3>
-            <p className="text-sm text-muted-foreground">Tag: {tag}</p>
+            <p className="text-sm text-muted-foreground">{tag}</p>
           </div>
 
           <div className="flex items-center gap-1 text-sm">
