@@ -5,6 +5,7 @@ import mime from 'mime';
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { fetchFileAsArrayBuffer } from '@/network';
 import { APP_CONFIG_DEFAULTS } from '@/app-config';
 import { getAppConfig } from '@/lib/utils';
 
@@ -36,11 +37,7 @@ function doesLocalFileExist(uri: string) {
 // LOCAL FILES MUST BE IN PUBLIC FOLDER
 async function loadFileData(filePath: string): Promise<ArrayBuffer> {
   if (isRemoteFile(filePath)) {
-    const response = await fetch(filePath);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${filePath} - ${response.status} ${response.statusText}`);
-    }
-    return await response.arrayBuffer();
+    return await fetchFileAsArrayBuffer(filePath);
   }
 
   // Try file system first (works in local development)
@@ -56,12 +53,7 @@ async function loadFileData(filePath: string): Promise<ArrayBuffer> {
   const publicFilePath = filePath.replace('public/', '');
   const fontUrl = `https://${process.env.VERCEL_URL}/${publicFilePath}`;
 
-  const response = await fetch(fontUrl);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${fontUrl} - ${response.status} ${response.statusText}`);
-  }
-
-  return await response.arrayBuffer();
+  return await fetchFileAsArrayBuffer(fontUrl);
 }
 
 async function getImageData(uri: string, fallbackUri?: string): Promise<ImageData> {

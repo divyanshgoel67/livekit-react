@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Room, RoomEvent, TokenSource } from 'livekit-client';
+import { getConnectionDetails } from '@/network';
 import { AppConfig } from '@/app-config';
 import { toastAlert } from '@/components/livekit/alert-toast';
 
@@ -45,21 +46,15 @@ export function useRoom(appConfig: AppConfig) {
         );
 
         try {
-          const res = await fetch(url.toString(), {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Sandbox-Id': appConfig.sandboxId ?? '',
-            },
-            body: JSON.stringify({
-              room_config: appConfig.agentName
-                ? {
-                    agents: [{ agent_name: appConfig.agentName }],
-                  }
-                : undefined,
-            }),
+          return await getConnectionDetails({
+            url: url.toString(),
+            sandboxId: appConfig.sandboxId ?? '',
+            roomConfig: appConfig.agentName
+              ? {
+                  agents: [{ agent_name: appConfig.agentName }],
+                }
+              : undefined,
           });
-          return await res.json();
         } catch (error) {
           console.error('Error fetching connection details:', error);
           throw new Error('Error fetching connection details!');
