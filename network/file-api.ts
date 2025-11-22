@@ -19,4 +19,3 @@ export async function fetchFileAsArrayBuffer(url: string): Promise<ArrayBuffer> 
     throw error;
   }
 }
-

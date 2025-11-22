@@ -1,7 +1,19 @@
 'use client';
 
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, Radar } from 'recharts';
-import { TrendingUp, AlertCircle } from 'lucide-react';
+import { AlertCircle, TrendingUp } from 'lucide-react';
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  PolarAngleAxis,
+  PolarGrid,
+  Radar,
+  RadarChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Progress } from './ui/progress';
 
@@ -48,7 +60,11 @@ export function AnalyticsDashboard() {
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={trendData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" style={{ fontSize: '12px' }} />
+              <XAxis
+                dataKey="month"
+                stroke="hsl(var(--muted-foreground))"
+                style={{ fontSize: '12px' }}
+              />
               <YAxis stroke="hsl(var(--muted-foreground))" style={{ fontSize: '12px' }} />
               <Tooltip
                 contentStyle={{
@@ -70,14 +86,14 @@ export function AnalyticsDashboard() {
       </Card>
 
       {/* Bottom Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Skill Analysis */}
         <Card className="bg-card/50 backdrop-blur-sm">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Skill Analysis</CardTitle>
-              <div className="flex items-center gap-1 text-sm text-success">
-                <TrendingUp className="w-4 h-4" />
+              <div className="text-success flex items-center gap-1 text-sm">
+                <TrendingUp className="h-4 w-4" />
                 <span>+12%</span>
               </div>
             </div>
@@ -86,7 +102,10 @@ export function AnalyticsDashboard() {
             <ResponsiveContainer width="100%" height={200}>
               <RadarChart data={skillsData}>
                 <PolarGrid stroke="hsl(var(--border))" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }} />
+                <PolarAngleAxis
+                  dataKey="subject"
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
+                />
                 <Radar
                   name="Skills"
                   dataKey="A"
@@ -96,7 +115,7 @@ export function AnalyticsDashboard() {
                 />
               </RadarChart>
             </ResponsiveContainer>
-            <p className="text-sm text-muted-foreground mt-4 text-center">
+            <p className="text-muted-foreground mt-4 text-center text-sm">
               Your <span className="text-primary font-medium">Empathy</span> is trending up ⬆️
             </p>
           </CardContent>
@@ -113,7 +132,7 @@ export function AnalyticsDashboard() {
                 <div key={index} className="space-y-1.5">
                   <div className="flex justify-between text-sm">
                     <span className="text-foreground">{obj.name}</span>
-                    <span className="font-bold text-foreground">{obj.success}%</span>
+                    <span className="text-foreground font-bold">{obj.success}%</span>
                   </div>
                   <Progress value={obj.success} />
                 </div>
@@ -126,16 +145,16 @@ export function AnalyticsDashboard() {
         <Card className="bg-card/50 backdrop-blur-sm lg:col-span-2">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
-                <AlertCircle className="w-5 h-5 text-destructive" />
+              <div className="bg-destructive/10 flex h-10 w-10 items-center justify-center rounded-lg">
+                <AlertCircle className="text-destructive h-5 w-5" />
               </div>
               <CardTitle>Key Weakness</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground leading-relaxed">
-              You frequently interrupt the customer within the first 10 seconds. Focus on active listening and
-              letting them finish their thoughts before responding.
+              You frequently interrupt the customer within the first 10 seconds. Focus on active
+              listening and letting them finish their thoughts before responding.
             </p>
           </CardContent>
         </Card>

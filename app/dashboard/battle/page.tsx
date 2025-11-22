@@ -1,9 +1,9 @@
 'use client';
 
-import { DashboardSidebar } from '@/components/dashboard/sidebar';
+import { Clock, Swords, Trophy, Users, Zap } from 'lucide-react';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
+import { DashboardSidebar } from '@/components/dashboard/sidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/dashboard/ui/card';
-import { Swords, Trophy, Users, Clock, Zap } from 'lucide-react';
 import { Button } from '@/components/livekit/button';
 
 const activeBattles = [
@@ -21,30 +21,32 @@ const leaderboard = [
 
 export default function BattlePage() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex">
+    <div className="bg-background text-foreground flex min-h-screen">
       <DashboardSidebar />
 
-      <main className="flex-1 ml-20">
+      <main className="ml-20 flex-1">
         <DashboardHeader />
 
         <div className="p-8">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-foreground mb-2">Battle Arena</h1>
-            <p className="text-muted-foreground">Compete with other agents and climb the leaderboard</p>
+            <h1 className="text-foreground mb-2 text-4xl font-bold">Battle Arena</h1>
+            <p className="text-muted-foreground">
+              Compete with other agents and climb the leaderboard
+            </p>
           </div>
 
           <div className="grid grid-cols-12 gap-6">
             {/* Active Battles */}
-            <Card className="col-span-8 bg-gradient-to-br from-accent/20 to-destructive/20 border-accent/30">
+            <Card className="from-accent/20 to-destructive/20 border-accent/30 col-span-8 bg-gradient-to-br">
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center">
-                    <Swords className="w-6 h-6 text-accent" />
+                  <div className="bg-accent/20 flex h-12 w-12 items-center justify-center rounded-xl">
+                    <Swords className="text-accent h-6 w-6" />
                   </div>
                   <div>
                     <CardTitle>Active Battles</CardTitle>
                     <div className="flex items-center gap-1 text-sm">
-                      <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                      <div className="bg-success h-2 w-2 animate-pulse rounded-full" />
                       <span className="text-success">Live</span>
                     </div>
                   </div>
@@ -55,39 +57,39 @@ export default function BattlePage() {
                   {activeBattles.map((battle) => (
                     <div
                       key={battle.id}
-                      className="flex items-center justify-between p-4 bg-card/50 rounded-lg border border-border"
+                      className="bg-card/50 border-border flex items-center justify-between rounded-lg border p-4"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Users className="w-6 h-6 text-primary" />
+                        <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-full">
+                          <Users className="text-primary h-6 w-6" />
                         </div>
                         <div>
-                          <h3 className="font-bold text-foreground">{battle.opponent}</h3>
-                          <p className="text-sm text-muted-foreground">Score: {battle.score}</p>
+                          <h3 className="text-foreground font-bold">{battle.opponent}</h3>
+                          <p className="text-muted-foreground text-sm">Score: {battle.score}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <p className="text-sm text-muted-foreground">Time Left</p>
-                          <p className="font-bold text-foreground">{battle.timeLeft}</p>
+                          <p className="text-muted-foreground text-sm">Time Left</p>
+                          <p className="text-foreground font-bold">{battle.timeLeft}</p>
                         </div>
                         <Button variant="outline">View Battle</Button>
                       </div>
                     </div>
                   ))}
                 </div>
-                <Button className="w-full mt-4" size="lg">
-                  <Zap className="w-4 h-4 mr-2" />
+                <Button className="mt-4 w-full" size="lg">
+                  <Zap className="mr-2 h-4 w-4" />
                   Find New Battle
                 </Button>
               </CardContent>
             </Card>
 
             {/* Leaderboard */}
-            <Card className="col-span-4 bg-card/50 backdrop-blur-sm">
+            <Card className="bg-card/50 col-span-4 backdrop-blur-sm">
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <Trophy className="w-6 h-6 text-accent" />
+                  <Trophy className="text-accent h-6 w-6" />
                   <CardTitle>Leaderboard</CardTitle>
                 </div>
               </CardHeader>
@@ -96,19 +98,25 @@ export default function BattlePage() {
                   {leaderboard.map((entry) => (
                     <div
                       key={entry.rank}
-                      className={`flex items-center justify-between p-3 rounded-lg ${
-                        entry.name === 'You' ? 'bg-primary/10 border border-primary/30' : 'bg-muted/50'
+                      className={`flex items-center justify-between rounded-lg p-3 ${
+                        entry.name === 'You'
+                          ? 'bg-primary/10 border-primary/30 border'
+                          : 'bg-muted/50'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <span className="font-bold text-foreground w-6">#{entry.rank}</span>
-                        <span className="font-medium text-foreground">{entry.name}</span>
+                        <span className="text-foreground w-6 font-bold">#{entry.rank}</span>
+                        <span className="text-foreground font-medium">{entry.name}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-foreground">{entry.score}</span>
+                        <span className="text-foreground font-bold">{entry.score}</span>
                         <span
                           className={`text-xs ${
-                            entry.change.startsWith('+') ? 'text-success' : entry.change.startsWith('-') ? 'text-destructive' : 'text-muted-foreground'
+                            entry.change.startsWith('+')
+                              ? 'text-success'
+                              : entry.change.startsWith('-')
+                                ? 'text-destructive'
+                                : 'text-muted-foreground'
                           }`}
                         >
                           {entry.change}
@@ -125,4 +133,3 @@ export default function BattlePage() {
     </div>
   );
 }
-

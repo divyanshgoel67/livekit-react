@@ -1,15 +1,15 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { DashboardSidebar } from '@/components/dashboard/sidebar';
-import { SessionView } from '@/components/app/session-view';
-import { StartAudio, RoomAudioRenderer } from '@livekit/components-react';
-import { Toaster } from '@/components/livekit/toaster';
-import { useSession } from '@/components/app/session-provider';
-import { Button } from '@/components/livekit/button';
-import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
+import { RoomAudioRenderer, StartAudio } from '@livekit/components-react';
 import type { AppConfig } from '@/app-config';
+import { useSession } from '@/components/app/session-provider';
+import { SessionView } from '@/components/app/session-view';
+import { DashboardSidebar } from '@/components/dashboard/sidebar';
+import { Button } from '@/components/livekit/button';
+import { Toaster } from '@/components/livekit/toaster';
 
 export function VoiceAgentContent({ appConfig }: { appConfig: AppConfig }) {
   const router = useRouter();
@@ -23,31 +23,33 @@ export function VoiceAgentContent({ appConfig }: { appConfig: AppConfig }) {
 
   return (
     <>
-      <div className="min-h-screen bg-background text-foreground flex">
+      <div className="bg-background text-foreground flex min-h-screen">
         <DashboardSidebar />
 
-        <main className="flex-1 ml-20">
+        <main className="ml-20 flex-1">
           {!isSessionActive ? (
-            <div className="flex flex-col items-center justify-center min-h-screen p-8">
-              <div className="max-w-2xl w-full space-y-8">
+            <div className="flex min-h-screen flex-col items-center justify-center p-8">
+              <div className="w-full max-w-2xl space-y-8">
                 <Link href="/">
                   <Button variant="outline" className="mb-4">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    <ArrowLeft className="mr-2 h-4 w-4" />
                     Back to Dashboard
                   </Button>
                 </Link>
 
-                <div className="bg-card/50 backdrop-blur-sm rounded-2xl p-8 border border-border text-center">
-                  <h1 className="text-4xl font-bold text-foreground mb-4">Voice Agent Simulation</h1>
+                <div className="bg-card/50 border-border rounded-2xl border p-8 text-center backdrop-blur-sm">
+                  <h1 className="text-foreground mb-4 text-4xl font-bold">
+                    Voice Agent Simulation
+                  </h1>
                   <p className="text-muted-foreground mb-8 text-lg">
-                    Start a conversation with our AI voice agent to practice your communication skills. The agent will
-                    simulate real-world scenarios and provide feedback.
+                    Start a conversation with our AI voice agent to practice your communication
+                    skills. The agent will simulate real-world scenarios and provide feedback.
                   </p>
 
                   <Button
                     size="lg"
                     onClick={startSession}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg px-8 py-6"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg font-bold"
                   >
                     Start Voice Session
                   </Button>
@@ -56,7 +58,11 @@ export function VoiceAgentContent({ appConfig }: { appConfig: AppConfig }) {
             </div>
           ) : (
             <div className="h-screen">
-              <SessionView appConfig={appConfig} className="h-full w-full" onDisconnect={handleDisconnect} />
+              <SessionView
+                appConfig={appConfig}
+                className="h-full w-full"
+                onDisconnect={handleDisconnect}
+              />
             </div>
           )}
         </main>
@@ -69,4 +75,3 @@ export function VoiceAgentContent({ appConfig }: { appConfig: AppConfig }) {
     </>
   );
 }
-

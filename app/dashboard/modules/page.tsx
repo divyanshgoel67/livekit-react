@@ -1,11 +1,11 @@
 'use client';
 
-import { DashboardSidebar } from '@/components/dashboard/sidebar';
-import { DashboardHeader } from '@/components/dashboard/dashboard-header';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/dashboard/ui/card';
-import { BookOpen, CheckCircle, Clock, Play } from 'lucide-react';
-import { Button } from '@/components/livekit/button';
 import Link from 'next/link';
+import { BookOpen, CheckCircle, Clock, Play } from 'lucide-react';
+import { DashboardHeader } from '@/components/dashboard/dashboard-header';
+import { DashboardSidebar } from '@/components/dashboard/sidebar';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/dashboard/ui/card';
+import { Button } from '@/components/livekit/button';
 
 const modules = [
   {
@@ -48,19 +48,21 @@ const modules = [
 
 export default function ModulesPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex">
+    <div className="bg-background text-foreground flex min-h-screen">
       <DashboardSidebar />
 
-      <main className="flex-1 ml-20">
+      <main className="ml-20 flex-1">
         <DashboardHeader />
 
         <div className="p-8">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-foreground mb-2">Training Modules</h1>
-            <p className="text-muted-foreground">Explore and complete training modules to improve your skills</p>
+            <h1 className="text-foreground mb-2 text-4xl font-bold">Training Modules</h1>
+            <p className="text-muted-foreground">
+              Explore and complete training modules to improve your skills
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {modules.map((module) => (
               <Card
                 key={module.id}
@@ -69,15 +71,15 @@ export default function ModulesPage() {
                 } transition-colors`}
               >
                 <CardHeader>
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <BookOpen className="w-6 h-6 text-primary" />
+                  <div className="mb-2 flex items-start justify-between">
+                    <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg">
+                      <BookOpen className="text-primary h-6 w-6" />
                     </div>
                     {module.status === 'completed' && (
-                      <CheckCircle className="w-6 h-6 text-success" />
+                      <CheckCircle className="text-success h-6 w-6" />
                     )}
                     {module.status === 'locked' && (
-                      <Clock className="w-6 h-6 text-muted-foreground" />
+                      <Clock className="text-muted-foreground h-6 w-6" />
                     )}
                   </div>
                   <CardTitle className="text-xl">{module.title}</CardTitle>
@@ -85,11 +87,13 @@ export default function ModulesPage() {
                 <CardContent>
                   <p className="text-muted-foreground mb-4">{module.description}</p>
                   <div className="mb-4">
-                    <div className="flex items-center justify-between text-sm mb-2">
+                    <div className="mb-2 flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Progress</span>
-                      <span className="font-medium">{module.completed}/{module.lessons} lessons</span>
+                      <span className="font-medium">
+                        {module.completed}/{module.lessons} lessons
+                      </span>
                     </div>
-                    <div className="w-full bg-secondary rounded-full h-2">
+                    <div className="bg-secondary h-2 w-full rounded-full">
                       <div
                         className="bg-primary h-2 rounded-full transition-all"
                         style={{ width: `${module.progress}%` }}
@@ -104,7 +108,7 @@ export default function ModulesPage() {
                     <Link href="/dashboard/training" className="block">
                       <Button className="w-full">
                         {module.status === 'completed' ? 'Review' : 'Continue'}
-                        <Play className="w-4 h-4 ml-2" />
+                        <Play className="ml-2 h-4 w-4" />
                       </Button>
                     </Link>
                   )}
@@ -117,4 +121,3 @@ export default function ModulesPage() {
     </div>
   );
 }
-

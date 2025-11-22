@@ -5,9 +5,9 @@ import mime from 'mime';
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { fetchFileAsArrayBuffer } from '@/network';
 import { APP_CONFIG_DEFAULTS } from '@/app-config';
 import { getAppConfig } from '@/lib/utils';
+import { fetchFileAsArrayBuffer } from '@/network';
 
 type Dimensions = {
   width: number;

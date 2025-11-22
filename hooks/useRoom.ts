@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Room, RoomEvent, TokenSource } from 'livekit-client';
-import { getConnectionDetails } from '@/network';
 import { AppConfig } from '@/app-config';
 import { toastAlert } from '@/components/livekit/alert-toast';
+import { getConnectionDetails } from '@/network';
 
 export function useRoom(appConfig: AppConfig) {
   const aborted = useRef(false);

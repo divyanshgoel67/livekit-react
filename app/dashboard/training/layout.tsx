@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
-import { getAppConfig } from '@/lib/utils';
 import { SessionProvider } from '@/components/app/session-provider';
+import { getAppConfig } from '@/lib/utils';
 
 export default async function TrainingLayout({ children }: { children: React.ReactNode }) {
   const hdrs = await headers();
@@ -8,4 +8,3 @@ export default async function TrainingLayout({ children }: { children: React.Rea
 
   return <SessionProvider appConfig={appConfig}>{children}</SessionProvider>;
 }
-

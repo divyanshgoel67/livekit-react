@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios, { AxiosError, AxiosInstance } from 'axios';
 
 /**
  * Creates a configured axios instance
@@ -46,4 +46,3 @@ export const apiClient = createAxiosClient();
 export function isAxiosError(error: unknown): error is AxiosError {
   return axios.isAxiosError(error);
 }
-

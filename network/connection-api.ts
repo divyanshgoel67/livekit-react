@@ -45,4 +45,3 @@ export async function getConnectionDetails(
     throw new Error('Error fetching connection details!');
   }
 }
-

@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Home, Target, LayoutGrid, BarChart3, Swords, ScrollText, Users, User } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
+import { BarChart3, Home, LayoutGrid, ScrollText, Swords, Target, User, Users } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const navItems = [
   { icon: Home, label: 'Dashboard', path: '/' },
@@ -20,7 +20,7 @@ export function NavigationMenu() {
   const pathname = usePathname();
 
   return (
-    <nav className="hidden md:flex items-center gap-1">
+    <nav className="hidden items-center gap-1 md:flex">
       {navItems.map((item) => {
         const Icon = item.icon;
         const isActive = pathname === item.path;
@@ -30,13 +30,13 @@ export function NavigationMenu() {
             key={item.path}
             href={item.path}
             className={cn(
-              'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+              'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
               isActive
                 ? 'text-foreground bg-muted'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted'
             )}
           >
-            <Icon className="w-4 h-4" />
+            <Icon className="h-4 w-4" />
             <span>{item.label}</span>
           </Link>
         );
@@ -44,4 +44,3 @@ export function NavigationMenu() {
     </nav>
   );
 }
-

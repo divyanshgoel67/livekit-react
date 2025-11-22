@@ -124,7 +124,11 @@ export const SessionView = ({
         )}
         <div className="bg-background relative mx-auto max-w-2xl pb-3 md:pb-12">
           <Fade bottom className="absolute inset-x-0 top-0 h-4 -translate-y-full" />
-          <AgentControlBar controls={controls} onChatOpenChange={setChatOpen} onDisconnect={onDisconnect} />
+          <AgentControlBar
+            controls={controls}
+            onChatOpenChange={setChatOpen}
+            onDisconnect={onDisconnect}
+          />
         </div>
       </MotionBottom>
     </section>

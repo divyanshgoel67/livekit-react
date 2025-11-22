@@ -1,7 +1,10 @@
 // Placeholder avatars - you can replace these with actual images
-export const placeholderAvatar1 = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop';
-export const placeholderAvatar2 = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop';
-export const placeholderAvatar3 = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop';
+export const placeholderAvatar1 =
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop';
+export const placeholderAvatar2 =
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop';
+export const placeholderAvatar3 =
+  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop';
 
 export interface Persona {
   id: number;
@@ -132,4 +135,3 @@ export const recentHistory: RecentAttempt[] = [
     avatar: placeholderAvatar3,
   },
 ];
-

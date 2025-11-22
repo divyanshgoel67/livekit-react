@@ -1,9 +1,9 @@
 'use client';
 
-import { DashboardSidebar } from '@/components/dashboard/sidebar';
+import { Target, TrendingUp, Trophy, Users } from 'lucide-react';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
+import { DashboardSidebar } from '@/components/dashboard/sidebar';
 import { Card, CardContent } from '@/components/dashboard/ui/card';
-import { Users, Trophy, TrendingUp, Target } from 'lucide-react';
 
 const teamMembers = [
   {
@@ -46,60 +46,60 @@ const teamMembers = [
 
 export default function TeamPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex">
+    <div className="bg-background text-foreground flex min-h-screen">
       <DashboardSidebar />
 
-      <main className="flex-1 ml-20">
+      <main className="ml-20 flex-1">
         <DashboardHeader />
 
         <div className="p-8">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-foreground mb-2">Team</h1>
+            <h1 className="text-foreground mb-2 text-4xl font-bold">Team</h1>
             <p className="text-muted-foreground">View your team members and their performance</p>
           </div>
 
           {/* Team Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-4">
             <Card className="bg-card/50 backdrop-blur-sm">
               <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <Users className="w-5 h-5 text-primary" />
+                <div className="mb-2 flex items-center gap-3">
+                  <Users className="text-primary h-5 w-5" />
                   <span className="text-muted-foreground text-sm">Team Size</span>
                 </div>
-                <div className="text-3xl font-bold text-foreground">12</div>
+                <div className="text-foreground text-3xl font-bold">12</div>
               </CardContent>
             </Card>
             <Card className="bg-card/50 backdrop-blur-sm">
               <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <Trophy className="w-5 h-5 text-accent" />
+                <div className="mb-2 flex items-center gap-3">
+                  <Trophy className="text-accent h-5 w-5" />
                   <span className="text-muted-foreground text-sm">Avg. Score</span>
                 </div>
-                <div className="text-3xl font-bold text-foreground">825</div>
+                <div className="text-foreground text-3xl font-bold">825</div>
               </CardContent>
             </Card>
             <Card className="bg-card/50 backdrop-blur-sm">
               <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <Target className="w-5 h-5 text-success" />
+                <div className="mb-2 flex items-center gap-3">
+                  <Target className="text-success h-5 w-5" />
                   <span className="text-muted-foreground text-sm">Total Sessions</span>
                 </div>
-                <div className="text-3xl font-bold text-foreground">1,234</div>
+                <div className="text-foreground text-3xl font-bold">1,234</div>
               </CardContent>
             </Card>
             <Card className="bg-card/50 backdrop-blur-sm">
               <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <TrendingUp className="w-5 h-5 text-primary" />
+                <div className="mb-2 flex items-center gap-3">
+                  <TrendingUp className="text-primary h-5 w-5" />
                   <span className="text-muted-foreground text-sm">Growth</span>
                 </div>
-                <div className="text-3xl font-bold text-foreground">+12%</div>
+                <div className="text-foreground text-3xl font-bold">+12%</div>
               </CardContent>
             </Card>
           </div>
 
           {/* Team Members */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {teamMembers.map((member) => (
               <Card
                 key={member.id}
@@ -108,30 +108,30 @@ export default function TeamPage() {
                 } transition-colors`}
               >
                 <CardContent className="p-6">
-                  <div className="flex items-center gap-4 mb-4">
+                  <div className="mb-4 flex items-center gap-4">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={member.avatar}
                       alt={member.name}
-                      className="w-16 h-16 rounded-full object-cover"
+                      className="h-16 w-16 rounded-full object-cover"
                     />
                     <div>
-                      <h3 className="font-bold text-foreground text-lg">{member.name}</h3>
-                      <p className="text-sm text-muted-foreground">{member.role}</p>
+                      <h3 className="text-foreground text-lg font-bold">{member.name}</h3>
+                      <p className="text-muted-foreground text-sm">{member.role}</p>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground text-sm">Rank</span>
-                      <span className="font-bold text-foreground">#{member.rank}</span>
+                      <span className="text-foreground font-bold">#{member.rank}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground text-sm">Score</span>
-                      <span className="font-bold text-foreground">{member.score}</span>
+                      <span className="text-foreground font-bold">{member.score}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground text-sm">Sessions</span>
-                      <span className="font-bold text-foreground">{member.sessions}</span>
+                      <span className="text-foreground font-bold">{member.sessions}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -143,4 +143,3 @@ export default function TeamPage() {
     </div>
   );
 }
-

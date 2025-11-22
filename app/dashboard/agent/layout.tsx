@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
-import { getAppConfig } from '@/lib/utils';
 import { SessionProvider } from '@/components/app/session-provider';
+import { getAppConfig } from '@/lib/utils';
 import { VoiceAgentContent } from './voice-agent-content';
 
 export default async function VoiceAgentLayout({ children }: { children: React.ReactNode }) {
@@ -13,4 +13,3 @@ export default async function VoiceAgentLayout({ children }: { children: React.R
     </SessionProvider>
   );
 }
-

@@ -8,4 +8,3 @@ export default async function VoicePage() {
 
   return <App appConfig={appConfig} />;
 }
-
