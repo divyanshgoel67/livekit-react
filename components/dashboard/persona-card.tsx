@@ -28,18 +28,14 @@ export function PersonaCard({
 
   return (
     <div className="flex-shrink-0 p-2">
-      <div
-        onClick={onClick}
-        className={cn(
-          'relative w-72 bg-card/50 backdrop-blur-sm rounded-2xl overflow-hidden border-2 transition-all cursor-pointer hover:scale-105',
-          selected ? 'border-primary shadow-lg shadow-primary/20' : 'border-border hover:border-primary/50'
-        )}
-      >
-        <div className="absolute top-4 left-4 w-8 h-8 rounded-lg bg-background/80 backdrop-blur-sm flex items-center justify-center font-bold text-foreground">
-          {id}
-        </div>
-
-        <div className="aspect-[4/3] overflow-hidden bg-muted">
+        <div
+          onClick={onClick}
+          className={cn(
+            'relative w-72 bg-card/50 backdrop-blur-sm rounded-2xl overflow-hidden border-2 transition-all cursor-pointer hover:scale-105',
+            selected ? 'border-primary shadow-lg shadow-primary/20' : 'border-border hover:border-primary/50'
+          )}
+        >
+          <div className="aspect-[4/3] overflow-hidden bg-muted">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={avatar} alt={name} className="w-full h-full object-cover" />
         </div>
