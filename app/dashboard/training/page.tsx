@@ -38,7 +38,7 @@ export default function TrainingPage() {
   const handleStartSimulation = () => {
     console.log('🚀 Starting simulation with lead:', selectedLead);
     // Open agent page in a new tab
-    const agentUrl = '/standalone/dashboard/agent';
+    const agentUrl = '/agent';
     window.open(agentUrl, '_blank');
     // Close the drawer
     handleCloseDrawer();

@@ -33,7 +33,7 @@ const quickLinks = [
   {
     icon: Phone,
     label: 'Voice Agent',
-    path: '/standalone/dashboard/agent',
+    path: '/agent',
     description: 'Start a voice session',
   },
   {
