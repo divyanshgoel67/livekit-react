@@ -1,14 +1,26 @@
 'use client';
 
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import { Clock, Swords, Target, TrendingUp, Trophy } from 'lucide-react';
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer } from 'recharts';
 import { CareerJourney } from '@/components/dashboard/career-journey';
 import { Card, CardContent } from '@/components/dashboard/ui/card';
 import { Progress } from '@/components/dashboard/ui/progress';
 import { Button } from '@/components/livekit/button';
+import { HomeCardShimmer } from './shimmer';
 
-const skillsData = [
+interface HomeData {
+  skillsData: Array<{ subject: string; A: number; fullMark: number }>;
+  missionProgress: number;
+  battleArena: {
+    onlineAgents: number;
+    nextTournament: string;
+    yourRank: number;
+  };
+}
+
+const defaultSkillsData = [
   { subject: 'Empathy', A: 120, fullMark: 150 },
   { subject: 'Closing', A: 98, fullMark: 150 },
   { subject: 'Pace', A: 86, fullMark: 150 },
@@ -18,6 +30,57 @@ const skillsData = [
 ];
 
 export function HomeView() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState<HomeData | null>(null);
+
+  useEffect(() => {
+    // Simulate async data fetching
+    const fetchData = async () => {
+      setIsLoading(true);
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 900));
+      
+      setData({
+        skillsData: defaultSkillsData,
+        missionProgress: 65,
+        battleArena: {
+          onlineAgents: 14,
+          nextTournament: '2h 30m',
+          yourRank: 8,
+        },
+      });
+      setIsLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
+  if (isLoading || !data) {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-500">
+        <div className="grid grid-cols-12 gap-6">
+          <div className="col-span-8">
+            <HomeCardShimmer />
+          </div>
+          <div className="col-span-4">
+            <HomeCardShimmer />
+          </div>
+          <div className="col-span-8">
+            <HomeCardShimmer />
+          </div>
+          <div className="col-span-4">
+            <HomeCardShimmer />
+          </div>
+          <div className="col-span-12 grid grid-cols-3 gap-4">
+            <HomeCardShimmer />
+            <HomeCardShimmer />
+            <HomeCardShimmer />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* Main Dashboard Grid */}
@@ -50,7 +113,7 @@ export function HomeView() {
                 <span className="text-muted-foreground text-sm">Mission Progress</span>
                 <span className="text-foreground text-sm font-bold">2/3 Objectives</span>
               </div>
-              <Progress value={65} className="h-3" />
+              <Progress value={data.missionProgress} className="h-3" />
             </div>
 
             <Link href="/dashboard/agent">
@@ -83,15 +146,15 @@ export function HomeView() {
             <div className="mb-6 space-y-4">
               <div className="border-border/50 flex items-center justify-between border-b py-2">
                 <span className="text-muted-foreground">Online Agents</span>
-                <span className="text-foreground font-bold">14</span>
+                <span className="text-foreground font-bold">{data.battleArena.onlineAgents}</span>
               </div>
               <div className="border-border/50 flex items-center justify-between border-b py-2">
                 <span className="text-muted-foreground">Next Tournament</span>
-                <span className="text-accent font-bold">2h 30m</span>
+                <span className="text-accent font-bold">{data.battleArena.nextTournament}</span>
               </div>
               <div className="flex items-center justify-between py-2">
                 <span className="text-muted-foreground">Your Rank</span>
-                <span className="text-primary font-bold">#8</span>
+                <span className="text-primary font-bold">#{data.battleArena.yourRank}</span>
               </div>
             </div>
 
@@ -120,7 +183,7 @@ export function HomeView() {
             </div>
 
             <ResponsiveContainer width="100%" height={200}>
-              <RadarChart data={skillsData}>
+              <RadarChart data={data.skillsData}>
                 <PolarGrid stroke="hsl(var(--border))" />
                 <PolarAngleAxis
                   dataKey="subject"

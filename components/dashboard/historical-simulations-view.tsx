@@ -28,9 +28,12 @@ import {
 
 const HistoricalSimulationsView = () => {
   const [selectedSimulation, setSelectedSimulation] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [performanceData, setPerformanceData] = useState<any[]>([]);
+  const [flightLog, setFlightLog] = useState<any[]>([]);
 
   // Mock Data for Chart (Last 10 scores)
-  const performanceData = [
+  const mockPerformanceData = [
     { call: '1', score: 65, date: 'Nov 12' },
     { call: '2', score: 68, date: 'Nov 13' },
     { call: '3', score: 72, date: 'Nov 14' },
@@ -44,7 +47,7 @@ const HistoricalSimulationsView = () => {
   ];
 
   // Mock Data for Flight Log
-  const flightLog = [
+  const mockFlightLog = [
     {
       id: 1,
       lead: { name: 'Sarah Jenkins', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=faces' },
@@ -92,6 +95,21 @@ const HistoricalSimulationsView = () => {
     }
   ];
 
+  useEffect(() => {
+    // Simulate async data fetching
+    const fetchData = async () => {
+      setIsLoading(true);
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setPerformanceData(mockPerformanceData);
+      setFlightLog(mockFlightLog);
+      setIsLoading(false);
+    };
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const getOutcomeBadgeStyle = (outcome: string) => {
     switch (outcome) {
       case 'Meeting Booked': return 'bg-emerald-50 text-emerald-700 border border-emerald-100';
@@ -116,6 +134,38 @@ const HistoricalSimulationsView = () => {
     if (score >= 80) return 'text-emerald-600';
     return 'text-red-600';
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8 animate-in fade-in duration-500 pb-10 bg-gray-50 p-6 rounded-xl">
+        {/* Loading shimmer for vitals */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm animate-pulse">
+              <div className="h-4 bg-slate-200 rounded w-24 mb-4"></div>
+              <div className="h-10 bg-slate-200 rounded w-20"></div>
+            </div>
+          ))}
+        </div>
+        {/* Loading shimmer for chart */}
+        <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm animate-pulse">
+          <div className="h-6 bg-slate-200 rounded w-48 mb-6"></div>
+          <div className="h-64 bg-slate-100 rounded"></div>
+        </div>
+        {/* Loading shimmer for table */}
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm animate-pulse">
+          <div className="p-6 border-b border-slate-100">
+            <div className="h-6 bg-slate-200 rounded w-32"></div>
+          </div>
+          <div className="p-6 space-y-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-16 bg-slate-100 rounded"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10 bg-gray-50 p-6 rounded-xl">

@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { LeadCard } from './lead-card';
+import { LeadCardShimmer } from './shimmer';
 
 interface Lead {
   id: string;
@@ -15,7 +16,7 @@ interface Lead {
   dealValue: string;
 }
 
-const leads: Lead[] = [
+const mockLeads: Lead[] = [
   {
     id: '1',
     name: 'Sarah Jenkins',
@@ -140,6 +141,22 @@ const leads: Lead[] = [
 ];
 
 const LeadsSection = ({ onLeadClick, onViewAll }: { onLeadClick: (lead: any) => void, onViewAll: () => void }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [leads, setLeads] = useState<Lead[]>([]);
+
+  useEffect(() => {
+    // Simulate async data fetching
+    const fetchLeads = async () => {
+      setIsLoading(true);
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setLeads(mockLeads);
+      setIsLoading(false);
+    };
+
+    fetchLeads();
+  }, []);
+
   const recommended = leads.filter(l => l.type === 'recommended');
   const favorites = leads.filter(l => l.type === 'favorite');
 
@@ -157,19 +174,27 @@ const LeadsSection = ({ onLeadClick, onViewAll }: { onLeadClick: (lead: any) => 
           </button>
         </div>
         <div className="flex overflow-x-auto pb-6 gap-6 snap-x scrollbar-hide">
-          {recommended.map(lead => (
-            <div key={lead.id} className="min-w-[350px] snap-start">
-              <LeadCard
-                name={lead.name}
-                role={lead.role}
-                avatar={lead.avatar}
-                difficulty={lead.difficulty}
-                source={lead.source}
-                dealValue={lead.dealValue}
-                onClick={() => onLeadClick(lead)}
-              />
-            </div>
-          ))}
+          {isLoading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="min-w-[350px] snap-start">
+                <LeadCardShimmer />
+              </div>
+            ))
+          ) : (
+            recommended.map(lead => (
+              <div key={lead.id} className="min-w-[350px] snap-start">
+                <LeadCard
+                  name={lead.name}
+                  role={lead.role}
+                  avatar={lead.avatar}
+                  difficulty={lead.difficulty}
+                  source={lead.source}
+                  dealValue={lead.dealValue}
+                  onClick={() => onLeadClick(lead)}
+                />
+              </div>
+            ))
+          )}
         </div>
       </section>
 
@@ -185,19 +210,27 @@ const LeadsSection = ({ onLeadClick, onViewAll }: { onLeadClick: (lead: any) => 
           </button>
         </div>
         <div className="flex overflow-x-auto pb-6 gap-6 snap-x scrollbar-hide">
-          {favorites.map(lead => (
-            <div key={lead.id} className="min-w-[350px] snap-start">
-              <LeadCard
-                name={lead.name}
-                role={lead.role}
-                avatar={lead.avatar}
-                difficulty={lead.difficulty}
-                source={lead.source}
-                dealValue={lead.dealValue}
-                onClick={() => onLeadClick(lead)}
-              />
-            </div>
-          ))}
+          {isLoading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="min-w-[350px] snap-start">
+                <LeadCardShimmer />
+              </div>
+            ))
+          ) : (
+            favorites.map(lead => (
+              <div key={lead.id} className="min-w-[350px] snap-start">
+                <LeadCard
+                  name={lead.name}
+                  role={lead.role}
+                  avatar={lead.avatar}
+                  difficulty={lead.difficulty}
+                  source={lead.source}
+                  dealValue={lead.dealValue}
+                  onClick={() => onLeadClick(lead)}
+                />
+              </div>
+            ))
+          )}
         </div>
       </section>
     </div>

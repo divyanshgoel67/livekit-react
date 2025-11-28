@@ -1,9 +1,27 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Target } from 'lucide-react';
+import { HeroBannerShimmer } from './shimmer';
 
 const HeroBanner = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate async data fetching
+    const fetchData = async () => {
+      setIsLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 600));
+      setIsLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
+  if (isLoading) {
+    return <HeroBannerShimmer />;
+  }
+
   return (
     <div className="relative w-full rounded-3xl overflow-hidden bg-gradient-to-r from-blue-900 to-violet-900 p-8 shadow-lg">
       <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">

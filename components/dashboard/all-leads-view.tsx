@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { ArrowLeft, Search, Filter } from 'lucide-react';
 import { LeadCard } from './lead-card';
+import { LeadCardShimmer } from './shimmer';
 import FilterSidebar from './filter-sidebar';
 
 interface Lead {
@@ -19,7 +20,7 @@ interface Lead {
 }
 
 // Extended mock data
-const allLeads: Lead[] = [
+const mockAllLeads: Lead[] = [
   { id: '1', name: 'Sarah Jenkins', role: 'CTO, TechFlow', company: 'TechFlow', difficulty: 3, avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=faces', type: 'recommended', source: 'LinkedIn', commission: '$1,200', tags: ['Decision Maker', 'Busy'] },
   { id: '2', name: 'David Chen', role: 'VP Sales, Growth.io', company: 'Growth.io', difficulty: 4, avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=faces', type: 'recommended', source: 'Referral', commission: '$2,500', tags: ['Friendly', 'Decision Maker'] },
   { id: '3', name: 'Amanda Low', role: 'Director, Innovate', company: 'Innovate', difficulty: 2, avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=faces', type: 'recommended', source: 'Inbound', commission: '$800', tags: ['Budget-Conscious'] },
@@ -41,6 +42,8 @@ interface AllLeadsViewProps {
 
 const AllLeadsView = ({ onBack, onLeadClick }: AllLeadsViewProps) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [allLeads, setAllLeads] = useState<Lead[]>([]);
   const [filters, setFilters] = useState({
     difficulty: [] as string[],
     source: [] as string[],
@@ -48,6 +51,18 @@ const AllLeadsView = ({ onBack, onLeadClick }: AllLeadsViewProps) => {
     maxDealValue: '',
     personas: [] as string[]
   });
+
+  useEffect(() => {
+    // Simulate async data fetching
+    const fetchLeads = async () => {
+      setIsLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setAllLeads(mockAllLeads);
+      setIsLoading(false);
+    };
+
+    fetchLeads();
+  }, []);
 
   const filteredLeads = useMemo(() => {
     return allLeads.filter(lead => {
@@ -120,18 +135,24 @@ const AllLeadsView = ({ onBack, onLeadClick }: AllLeadsViewProps) => {
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredLeads.map(lead => (
-          <LeadCard
-            key={lead.id}
-            name={lead.name}
-            role={lead.role}
-            avatar={lead.avatar}
-            difficulty={lead.difficulty}
-            source={lead.source}
-            dealValue={lead.commission}
-            onClick={() => onLeadClick(lead)}
-          />
-        ))}
+        {isLoading ? (
+          Array.from({ length: 8 }).map((_, i) => (
+            <LeadCardShimmer key={i} />
+          ))
+        ) : (
+          filteredLeads.map(lead => (
+            <LeadCard
+              key={lead.id}
+              name={lead.name}
+              role={lead.role}
+              avatar={lead.avatar}
+              difficulty={lead.difficulty}
+              source={lead.source}
+              dealValue={lead.commission}
+              onClick={() => onLeadClick(lead)}
+            />
+          ))
+        )}
       </div>
 
       <FilterSidebar
