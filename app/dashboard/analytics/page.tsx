@@ -1,26 +1,23 @@
 'use client';
 
-import { AnalyticsDashboard } from '@/components/dashboard/analytics-dashboard';
-import { DashboardHeader } from '@/components/dashboard/dashboard-header';
-import { DashboardSidebar } from '@/components/dashboard/sidebar';
+import Sidebar from '@/components/dashboard/sidebar-new';
+import TopNav from '@/components/dashboard/top-nav';
 
 export default function AnalyticsPage() {
   return (
-    <div className="bg-background text-foreground flex min-h-screen">
-      <DashboardSidebar />
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+      <Sidebar />
+      <TopNav />
 
-      <main className="ml-20 flex-1">
-        <DashboardHeader />
-
-        <div className="p-8">
-          <div className="mb-8">
-            <h1 className="text-foreground mb-2 text-4xl font-bold">Analytics</h1>
-            <p className="text-muted-foreground">
-              Track your performance and identify areas for improvement
-            </p>
+      <main className="ml-64 p-8 max-w-7xl mx-auto">
+        <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4 animate-in fade-in duration-500">
+          <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center">
+            <span className="text-4xl">🚧</span>
           </div>
-
-          <AnalyticsDashboard />
+          <h2 className="text-2xl font-bold text-slate-900">Analytics</h2>
+          <p className="text-slate-500 max-w-md">
+            This training module is currently under construction. Please check back later or try the Introduction Calls module.
+          </p>
         </div>
       </main>
     </div>

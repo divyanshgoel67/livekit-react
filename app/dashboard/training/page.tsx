@@ -1,252 +1,122 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Flame, Trophy } from 'lucide-react';
-import { motion } from 'motion/react';
-import { RoomAudioRenderer, StartAudio } from '@livekit/components-react';
-import { useSession } from '@/components/app/session-provider';
-import { SessionView } from '@/components/app/session-view';
-import { AnalyticsDashboard } from '@/components/dashboard/analytics-dashboard';
-import { PersonaSection } from '@/components/dashboard/persona-section';
-import { RecentAttemptRow } from '@/components/dashboard/recent-attempt-row';
-import { DashboardSidebar } from '@/components/dashboard/sidebar';
-import { TabNavigation } from '@/components/dashboard/tab-navigation';
-import { Card, CardContent } from '@/components/dashboard/ui/card';
-import { Button } from '@/components/livekit/button';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Sidebar from '@/components/dashboard/sidebar-new';
+import TopNav from '@/components/dashboard/top-nav';
+import StartSimulationView from '@/components/dashboard/start-simulation-view';
+import HistoricalSimulationsView from '@/components/dashboard/historical-simulations-view';
+import IntroCallTabs from '@/components/dashboard/intro-call-tabs';
+import LeadDrawer from '@/components/dashboard/lead-drawer';
+import AllLeadsView from '@/components/dashboard/all-leads-view';
 import { Toaster } from '@/components/livekit/toaster';
-import {
-  easyPersonas,
-  favoritePersonas,
-  hardPersonas,
-  lastPlayedPersonas,
-  recentHistory,
-} from '@/lib/training-data';
-import { useTrainingStore } from '@/store/training-store';
-
-const MotionSessionView = motion.create(SessionView);
-
-const VIEW_MOTION_PROPS = {
-  variants: {
-    visible: {
-      opacity: 1,
-    },
-    hidden: {
-      opacity: 0,
-    },
-  },
-  initial: 'hidden',
-  animate: 'visible',
-  exit: 'hidden',
-  transition: {
-    duration: 0.5,
-    ease: 'linear',
-  },
-};
 
 export default function TrainingPage() {
-  const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'simulation' | 'analytics'>('simulation');
-  const [showLiveKit, setShowLiveKit] = useState(false);
-  const { appConfig, isSessionActive, startSession, endSession } = useSession();
-  const { selectedPersona, setSelectedPersona } = useTrainingStore();
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState<'start' | 'historical'>('start');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<any>(null);
+  const [showAllLeads, setShowAllLeads] = useState(false);
+  const [activeView, setActiveView] = useState<string>('introduction-calls');
 
-  // Initialize with first persona if none selected
+  // Get active view from URL params or default to introduction-calls
   useEffect(() => {
-    if (!selectedPersona && lastPlayedPersonas.length > 0) {
-      setSelectedPersona(lastPlayedPersonas[0]);
+    if (searchParams) {
+      const view = searchParams.get('view') || 'introduction-calls';
+      setActiveView(view);
     }
-  }, [selectedPersona, setSelectedPersona]);
+  }, [searchParams]);
 
-  // Handle disconnect - redirect to dashboard home
-  const handleDisconnect = () => {
-    endSession();
-    setShowLiveKit(false);
-    router.push('/');
+  const handleLeadClick = (lead: any) => {
+    setSelectedLead(lead);
+    setIsDrawerOpen(true);
   };
 
-  // Show LiveKit interface when showLiveKit is true
-  if (showLiveKit) {
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false);
+    setTimeout(() => setSelectedLead(null), 300); // Clear after animation
+  };
+
+  const handleStartSimulation = () => {
+    console.log('🚀 Starting simulation with lead:', selectedLead);
+    // Open agent page in a new tab
+    const agentUrl = '/dashboard/agent';
+    window.open(agentUrl, '_blank');
+    // Close the drawer
+    handleCloseDrawer();
+  };
+
+  // Show placeholder for non-introduction-calls views
+  if (activeView !== 'introduction-calls') {
+    const viewNames: Record<string, string> = {
+      'cold-calls': 'Cold Calls',
+      'discovery-calls': 'Discovery Calls',
+      'negotiation': 'Negotiation & Closing',
+      'situation': 'Situation handling',
+    };
+
+    const viewName = viewNames[activeView] || activeView.replace(/-/g, ' ');
+
     return (
-      <>
-        <div className="bg-background text-foreground min-h-screen">
-          <MotionSessionView
-            key="session-view"
-            {...VIEW_MOTION_PROPS}
-            appConfig={appConfig}
-            onDisconnect={handleDisconnect}
-          />
-        </div>
-        <StartAudio label="Start Audio" />
-        <RoomAudioRenderer />
-        <Toaster />
-      </>
+      <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+        <Sidebar />
+        <TopNav />
+
+        <main className="ml-64 p-8 max-w-7xl mx-auto">
+          <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4 animate-in fade-in duration-500">
+            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center">
+              <span className="text-4xl">🚧</span>
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 capitalize">{viewName}</h2>
+            <p className="text-slate-500 max-w-md">
+              This training module is currently under construction. Please check back later or try the Introduction Calls module.
+            </p>
+          </div>
+        </main>
+      </div>
     );
   }
 
   return (
-    <>
-      <div className="bg-background text-foreground flex min-h-screen">
-        <DashboardSidebar />
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+      <Sidebar />
+      <TopNav />
 
-        <main className="ml-20 flex-1 overflow-x-hidden p-8">
-          {/* Header */}
-          <div className="mb-8 flex items-center justify-between">
-            <div>
-              <h1 className="text-foreground mb-2 text-4xl font-bold">Introduction Call</h1>
-              <p className="text-muted-foreground">Master the art of the first conversation</p>
-            </div>
-
-            <div className="flex items-center gap-6">
-              <div className="bg-card border-border flex items-center gap-2 rounded-xl border px-4 py-2">
-                <Trophy className="text-accent h-5 w-5" />
-                <span className="text-foreground font-bold">Lvl 15</span>
-              </div>
-
-              <div className="bg-card border-border flex items-center gap-2 rounded-xl border px-4 py-2">
-                <Flame className="text-accent h-5 w-5" />
-                <span className="text-foreground font-bold">5 Day Streak</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Tab Navigation */}
-          <TabNavigation
-            tabs={[
-              { value: 'simulation', label: 'Start Simulation' },
-              { value: 'analytics', label: 'Historical Simulations' },
-            ]}
-            activeTab={activeTab}
-            onTabChange={(value) => setActiveTab(value as 'simulation' | 'analytics')}
+      <main className="ml-64 p-8 max-w-7xl mx-auto">
+        {showAllLeads ? (
+          <AllLeadsView
+            onBack={() => setShowAllLeads(false)}
+            onLeadClick={handleLeadClick}
           />
-
-          {/* Tab Content */}
-          {activeTab === 'simulation' ? (
-            <div className="space-y-8">
-              {/* Scenario Card */}
-              <Card className="bg-card/50 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <h2 className="text-foreground mb-3 text-2xl font-bold">
-                    Scenario: The Website Lead
-                  </h2>
-                  <p className="text-muted-foreground">
-                    <span className="text-foreground font-medium">Lead Source:</span> Contact form
-                    for 3BHK. <span className="text-foreground ml-4 font-medium">Goal:</span> Book a
-                    Discovery Meeting.
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Persona Selection */}
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-foreground text-2xl font-bold">Select Customer Persona</h2>
-                  <button className="text-primary hover:text-primary/80 cursor-pointer font-medium">
-                    See All →
-                  </button>
-                </div>
-
-                <PersonaSection
-                  title="Last Played"
-                  personas={lastPlayedPersonas}
-                  selectedPersona={selectedPersona}
-                  onPersonaSelect={setSelectedPersona}
-                />
-
-                <PersonaSection
-                  title="Favourites"
-                  personas={favoritePersonas}
-                  selectedPersona={selectedPersona}
-                  onPersonaSelect={setSelectedPersona}
-                />
-
-                <PersonaSection
-                  title="Difficulty: Easy"
-                  personas={easyPersonas}
-                  selectedPersona={selectedPersona}
-                  onPersonaSelect={setSelectedPersona}
-                  showCreateCustom
-                />
-
-                <PersonaSection
-                  title="Difficulty: Hard"
-                  personas={hardPersonas}
-                  selectedPersona={selectedPersona}
-                  onPersonaSelect={setSelectedPersona}
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-4">
-                <Button
-                  size="lg"
-                  onClick={() => {
-                    console.log('🚀 Starting simulation with persona:', selectedPersona);
-                    setShowLiveKit(true);
-                    startSession();
-                  }}
-                  className="bg-primary hover:bg-primary/90 h-14 flex-1 rounded-lg text-lg font-bold"
-                >
-                  START SIMULATION
-                </Button>
-                <Button size="lg" variant="outline" className="h-14 rounded-lg px-12 text-lg">
-                  Create Custom Persona
-                </Button>
-              </div>
-
-              {/* Recommendations */}
-              <div className="grid grid-cols-2 gap-4">
-                <Card className="bg-card/50 backdrop-blur-sm">
-                  <CardContent className="p-6">
-                    <div className="mb-3 flex items-center gap-3">
-                      <div className="bg-accent/10 flex h-10 w-10 items-center justify-center rounded-lg">
-                        <Trophy className="text-accent h-5 w-5" />
-                      </div>
-                      <h3 className="text-foreground font-bold">Daily Focus</h3>
-                    </div>
-                    <p className="text-muted-foreground">
-                      Tip: Your &apos;Pace&apos; was too fast yesterday. Try to slow down to 130
-                      WPM.
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-card/50 backdrop-blur-sm">
-                  <CardContent className="p-6">
-                    <div className="mb-3 flex items-center gap-3">
-                      <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
-                        <Flame className="text-primary h-5 w-5" />
-                      </div>
-                      <h3 className="text-foreground font-bold">Next Challenge</h3>
-                    </div>
-                    <p className="text-muted-foreground">
-                      Recommended: Try &apos;The Angry Investor&apos; to boost your Objection
-                      Handling score.
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="flex flex-col gap-2">
+              <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Introduction Call</h1>
+              <p className="text-slate-500">Master the art of the first conversation</p>
             </div>
-          ) : (
-            <div className="space-y-8">
-              <AnalyticsDashboard />
 
-              {/* Recent History */}
-              <div>
-                <h2 className="text-foreground mb-4 text-2xl font-bold">Recent History</h2>
-                <div className="space-y-3">
-                  {recentHistory.map((attempt) => (
-                    <RecentAttemptRow key={attempt.id} {...attempt} />
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-        </main>
-      </div>
-      <StartAudio label="Start Audio" />
-      <RoomAudioRenderer />
+            <IntroCallTabs activeTab={activeTab} onTabChange={setActiveTab} />
+
+            {activeTab === 'start' ? (
+              <StartSimulationView
+                onLeadClick={handleLeadClick}
+                onViewAll={() => setShowAllLeads(true)}
+              />
+            ) : (
+              <HistoricalSimulationsView />
+            )}
+          </div>
+        )}
+      </main>
+
+      <LeadDrawer
+        isOpen={isDrawerOpen}
+        onClose={handleCloseDrawer}
+        lead={selectedLead}
+        onStartSimulation={handleStartSimulation}
+      />
+
       <Toaster />
-    </>
+    </div>
   );
 }
