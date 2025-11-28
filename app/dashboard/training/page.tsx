@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Sidebar from '@/components/dashboard/sidebar-new';
 import TopNav from '@/components/dashboard/top-nav';
 import StartSimulationView from '@/components/dashboard/start-simulation-view';
@@ -11,10 +12,20 @@ import AllLeadsView from '@/components/dashboard/all-leads-view';
 import { Toaster } from '@/components/livekit/toaster';
 
 export default function TrainingPage() {
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<'start' | 'historical'>('start');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<any>(null);
   const [showAllLeads, setShowAllLeads] = useState(false);
+  const [activeView, setActiveView] = useState<string>('introduction-calls');
+
+  // Get active view from URL params or default to introduction-calls
+  useEffect(() => {
+    if (searchParams) {
+      const view = searchParams.get('view') || 'introduction-calls';
+      setActiveView(view);
+    }
+  }, [searchParams]);
 
   const handleLeadClick = (lead: any) => {
     setSelectedLead(lead);
@@ -34,6 +45,37 @@ export default function TrainingPage() {
     // Close the drawer
     handleCloseDrawer();
   };
+
+  // Show placeholder for non-introduction-calls views
+  if (activeView !== 'introduction-calls') {
+    const viewNames: Record<string, string> = {
+      'cold-calls': 'Cold Calls',
+      'discovery-calls': 'Discovery Calls',
+      'negotiation': 'Negotiation & Closing',
+      'situation': 'Situation handling',
+    };
+
+    const viewName = viewNames[activeView] || activeView.replace(/-/g, ' ');
+
+    return (
+      <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+        <Sidebar />
+        <TopNav />
+
+        <main className="ml-64 p-8 max-w-7xl mx-auto">
+          <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4 animate-in fade-in duration-500">
+            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center">
+              <span className="text-4xl">🚧</span>
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 capitalize">{viewName}</h2>
+            <p className="text-slate-500 max-w-md">
+              This training module is currently under construction. Please check back later or try the Introduction Calls module.
+            </p>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">

@@ -3,7 +3,7 @@
 import Sidebar from '@/components/dashboard/sidebar-new';
 import TopNav from '@/components/dashboard/top-nav';
 
-export default function TeamPage() {
+export default function EvaluationPage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
       <Sidebar />
@@ -14,7 +14,7 @@ export default function TeamPage() {
           <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center">
             <span className="text-4xl">🚧</span>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900">Shadowing</h2>
+          <h2 className="text-2xl font-bold text-slate-900">Evaluation Mode</h2>
           <p className="text-slate-500 max-w-md">
             This training module is currently under construction. Please check back later or try the Introduction Calls module.
           </p>
@@ -23,3 +23,4 @@ export default function TeamPage() {
     </div>
   );
 }
+

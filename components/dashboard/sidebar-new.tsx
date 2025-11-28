@@ -22,14 +22,14 @@ const Sidebar = ({ onNavigate, activeView }: SidebarProps) => {
       id: 'training-arena',
       path: '/dashboard/training',
       subItems: [
-        { label: 'Cold Calls', id: 'cold-calls', path: '/dashboard/training' },
-        { label: 'Introduction Calls', id: 'introduction-calls', path: '/dashboard/training' },
-        { label: 'Discovery Calls', id: 'discovery-calls', path: '/dashboard/training' },
-        { label: 'Negotiation & Closing', id: 'negotiation', path: '/dashboard/training' },
-        { label: 'Situation handling', id: 'situation', path: '/dashboard/training' },
+        { label: 'Cold Calls', id: 'cold-calls', path: '/dashboard/training?view=cold-calls' },
+        { label: 'Introduction Calls', id: 'introduction-calls', path: '/dashboard/training?view=introduction-calls' },
+        { label: 'Discovery Calls', id: 'discovery-calls', path: '/dashboard/training?view=discovery-calls' },
+        { label: 'Negotiation & Closing', id: 'negotiation', path: '/dashboard/training?view=negotiation' },
+        { label: 'Situation handling', id: 'situation', path: '/dashboard/training?view=situation' },
       ]
     },
-    { icon: FileText, label: 'Evaluation Mode', id: 'evaluation', path: '/dashboard/training' },
+    { icon: FileText, label: 'Evaluation Mode', id: 'evaluation', path: '/dashboard/evaluation' },
     { icon: Users, label: 'Shadowing', id: 'shadowing', path: '/dashboard/team' },
     { icon: BarChart2, label: 'Analytics', id: 'analytics', path: '/dashboard/analytics' },
     { icon: Award, label: 'Leaderboard', id: 'leaderboard', path: '/dashboard/battle' },
@@ -59,11 +59,20 @@ const Sidebar = ({ onNavigate, activeView }: SidebarProps) => {
     }
   };
 
-  // Determine active view based on pathname or activeView prop
+  // Determine active view based on pathname, search params, or activeView prop
   const getActiveView = () => {
     if (activeView) return activeView;
     if (pathname === '/' || pathname === '/dashboard') return 'home';
-    if (pathname?.startsWith('/dashboard/training')) return 'introduction-calls';
+    if (pathname?.startsWith('/dashboard/training')) {
+      // Check URL search params for view
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const view = params.get('view');
+        if (view) return view;
+      }
+      return 'introduction-calls';
+    }
+    if (pathname?.startsWith('/dashboard/evaluation')) return 'evaluation';
     if (pathname?.startsWith('/dashboard/analytics')) return 'analytics';
     if (pathname?.startsWith('/dashboard/battle')) return 'leaderboard';
     if (pathname?.startsWith('/dashboard/script')) return 'scripts';
