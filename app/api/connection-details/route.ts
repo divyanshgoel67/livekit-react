@@ -14,10 +14,17 @@ const API_KEY = process.env.LIVEKIT_API_KEY;
 const API_SECRET = process.env.LIVEKIT_API_SECRET;
 const LIVEKIT_URL = process.env.LIVEKIT_URL;
 
+// Log API key on module load
+console.log('🔑 [MODULE LOAD] API_KEY from .env.local:', API_KEY);
+
 // don't cache the results
 export const revalidate = 0;
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
+  console.log('=== CONNECTION DETAILS API CALLED ===');
+  console.log('🔑 [POST HANDLER] API_KEY from .env.local:', API_KEY);
   try {
     if (LIVEKIT_URL === undefined) {
       throw new Error('LIVEKIT_URL is not defined');
