@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Home, Target, FileText, Users, BarChart2, Award, ScrollText, User, ChevronDown, ChevronRight } from 'lucide-react';
 
 interface SidebarProps {
@@ -12,6 +12,7 @@ interface SidebarProps {
 const Sidebar = ({ onNavigate, activeView }: SidebarProps) => {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [expandedMenu, setExpandedMenu] = useState<string | null>('Training Arena');
 
   const menuItems = [
@@ -64,12 +65,9 @@ const Sidebar = ({ onNavigate, activeView }: SidebarProps) => {
     if (activeView) return activeView;
     if (pathname === '/' || pathname === '/dashboard') return 'home';
     if (pathname?.startsWith('/dashboard/training')) {
-      // Check URL search params for view
-      if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        const view = params.get('view');
-        if (view) return view;
-      }
+      // Check URL search params for view using Next.js useSearchParams
+      const view = searchParams?.get('view');
+      if (view) return view;
       return 'introduction-calls';
     }
     if (pathname?.startsWith('/dashboard/evaluation')) return 'evaluation';

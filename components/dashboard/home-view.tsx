@@ -116,7 +116,7 @@ export function HomeView() {
               <Progress value={data.missionProgress} className="h-3" />
             </div>
 
-            <Link href="/dashboard/agent">
+            <Link href="/standalone/dashboard/agent">
               <Button
                 size="lg"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold"
