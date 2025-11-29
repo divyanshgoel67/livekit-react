@@ -95,7 +95,7 @@ export default function TrainingPage() {
           ) : (
             <HistoricalSimulationsView />
           )}
-        </div>
+      </div>
       )}
 
       <LeadDrawer
