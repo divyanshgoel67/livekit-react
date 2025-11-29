@@ -26,6 +26,7 @@ export default function TrainingPage() {
   }, [searchParams]);
 
   const handleLeadClick = (lead: any) => {
+    console.log('Lead clicked - ID:', lead?.id);
     setSelectedLead(lead);
     setIsDrawerOpen(true);
   };
@@ -37,8 +38,10 @@ export default function TrainingPage() {
 
   const handleStartSimulation = () => {
     console.log('🚀 Starting simulation with lead:', selectedLead);
-    // Open agent page in a new tab
-    const agentUrl = '/agent';
+    // Get agent name from lead (using lead id as agent name, or you can map it differently)
+    const agentName = selectedLead?.id || selectedLead?.name;
+    // Open agent page in a new tab with agent name as query param
+    const agentUrl = agentName ? `/agent?agentName=${encodeURIComponent(agentName)}` : '/agent';
     window.open(agentUrl, '_blank');
     // Close the drawer
     handleCloseDrawer();

@@ -16,7 +16,6 @@ export interface AppConfig {
 
   // for LiveKit Cloud Sandbox
   sandboxId?: string;
-  agentName?: string;
 }
 
 export const APP_CONFIG_DEFAULTS: AppConfig = {
@@ -37,5 +36,4 @@ export const APP_CONFIG_DEFAULTS: AppConfig = {
 
   // for LiveKit Cloud Sandbox
   sandboxId: undefined,
-  agentName: undefined,
 };
