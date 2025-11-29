@@ -8,7 +8,8 @@ export interface ConnectionDetails {
 }
 
 export interface RoomConfig {
-  agents?: Array<{ agent_name: string }>;
+  metadata?: string;
+  agents?: Array<{ agent_name?: string; metadata?: string }>;
 }
 
 export interface GetConnectionDetailsParams {

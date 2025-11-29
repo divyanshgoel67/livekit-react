@@ -38,7 +38,7 @@ export function useRoom(appConfig: AppConfig) {
   }, [room]);
 
   const createTokenSource = useCallback(
-    (agentName?: string) =>
+    (metadata?: string) =>
       TokenSource.custom(async () => {
         const url = new URL(
           process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? '/api/connection-details',
@@ -49,9 +49,10 @@ export function useRoom(appConfig: AppConfig) {
           return await getConnectionDetails({
             url: url.toString(),
             sandboxId: appConfig.sandboxId ?? '',
-            roomConfig: agentName
+            roomConfig: metadata
               ? {
-                  agents: [{ agent_name: agentName }],
+                  metadata: metadata,
+                  agents: [{ metadata }],
                 }
               : undefined,
           });
@@ -64,12 +65,12 @@ export function useRoom(appConfig: AppConfig) {
   );
 
   const startSession = useCallback(
-    (agentName?: string) => {
+    (metadata?: string) => {
       setIsSessionActive(true);
 
       if (room.state === 'disconnected') {
         const { isPreConnectBufferEnabled } = appConfig;
-        const tokenSource = createTokenSource(agentName);
+        const tokenSource = createTokenSource(metadata);
         Promise.all([
           room.localParticipant.setMicrophoneEnabled(true, undefined, {
             preConnectBuffer: isPreConnectBufferEnabled,

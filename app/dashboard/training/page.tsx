@@ -38,10 +38,10 @@ export default function TrainingPage() {
 
   const handleStartSimulation = () => {
     console.log('🚀 Starting simulation with lead:', selectedLead);
-    // Get agent name from lead (using lead id as agent name, or you can map it differently)
-    const agentName = selectedLead?.id || selectedLead?.name;
-    // Open agent page in a new tab with agent name as query param
-    const agentUrl = agentName ? `/agent?agentName=${encodeURIComponent(agentName)}` : '/agent';
+    // Get lead ID to pass as metadata (not as agent name)
+    const leadId = selectedLead?.id || selectedLead?.name;
+    // Open agent page in a new tab with leadId as query param for metadata
+    const agentUrl = leadId ? `/agent?leadId=${encodeURIComponent(leadId)}` : '/agent';
     window.open(agentUrl, '_blank');
     // Close the drawer
     handleCloseDrawer();

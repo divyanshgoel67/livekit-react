@@ -14,15 +14,15 @@ export function VoiceAgentContent({ appConfig }: { appConfig: AppConfig }) {
   const { isSessionActive, startSession, endSession } = useSession();
   const [isInitializing, setIsInitializing] = useState(true);
 
-  // Get agent name from URL params
-  const agentName = searchParams?.get('agentName') || undefined;
+  // Get leadId from URL params to pass as metadata
+  const leadId = searchParams?.get('leadId') || undefined;
 
   // Auto-start session when page loads
   useEffect(() => {
     if (!isSessionActive) {
-      startSession(agentName);
+      startSession(leadId);
     }
-  }, [isSessionActive, startSession, agentName]);
+  }, [isSessionActive, startSession, leadId]);
 
   // Show loading screen briefly, then transition to session
   useEffect(() => {

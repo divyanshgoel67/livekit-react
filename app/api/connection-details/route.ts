@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { AccessToken, type AccessTokenOptions, type VideoGrant } from 'livekit-server-sdk';
-import { RoomConfiguration } from '@livekit/protocol';
+import { RoomConfiguration, RoomAgentDispatch } from '@livekit/protocol';
 
 type ConnectionDetails = {
   serverUrl: string;
@@ -13,6 +13,7 @@ type ConnectionDetails = {
 const API_KEY = process.env.LIVEKIT_API_KEY;
 const API_SECRET = process.env.LIVEKIT_API_SECRET;
 const LIVEKIT_URL = process.env.LIVEKIT_URL;
+const AGENT_NAME = 'default';
 
 // don't cache the results
 export const revalidate = 0;
@@ -29,9 +30,12 @@ export async function POST(req: Request) {
       throw new Error('LIVEKIT_API_SECRET is not defined');
     }
 
-    // Parse agent configuration from request body
+    // Parse metadata (UUID) from request body
     const body = await req.json();
-    const agentName: string = body?.room_config?.agents?.[0]?.agent_name;
+    // Get room-level metadata (prefer room-level, fallback to agent-level for backward compatibility)
+    const roomMetadata: string = body?.room_config?.metadata || body?.room_config?.agents?.[0]?.metadata;
+    // Get agent-level metadata
+    const agentMetadata: string = body?.room_config?.agents?.[0]?.metadata;
 
     // Generate participant token
     const participantName = 'user';
@@ -41,7 +45,8 @@ export async function POST(req: Request) {
     const participantToken = await createParticipantToken(
       { identity: participantIdentity, name: participantName },
       roomName,
-      agentName
+      roomMetadata,
+      agentMetadata
     );
 
     // Return connection details
@@ -66,7 +71,8 @@ export async function POST(req: Request) {
 function createParticipantToken(
   userInfo: AccessTokenOptions,
   roomName: string,
-  agentName?: string
+  roomMetadata?: string,
+  agentMetadata?: string
 ): Promise<string> {
   const at = new AccessToken(API_KEY, API_SECRET, {
     ...userInfo,
@@ -81,11 +87,20 @@ function createParticipantToken(
   };
   at.addGrant(grant);
 
-  if (agentName) {
-    at.roomConfig = new RoomConfiguration({
-      agents: [{ agentName }],
-    });
-  }
+  // Always create roomConfig with fixed agent name "default" and UUID in metadata
+  // Create RoomAgentDispatch with agent name "default" and metadata containing the UUID
+  const roomAgentDispatch = new RoomAgentDispatch({
+    agentName: AGENT_NAME,
+    metadata: agentMetadata || '',
+  });
+  
+  // Create RoomConfiguration with room-level metadata and agents
+  // Set room-level metadata to the same UUID
+  const roomConfig = new RoomConfiguration();
+  roomConfig.metadata = roomMetadata || '';
+  roomConfig.agents = [roomAgentDispatch];
+  
+  at.roomConfig = roomConfig;
 
   return at.toJwt();
 }
