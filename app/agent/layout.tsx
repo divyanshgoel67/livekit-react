@@ -1,7 +1,6 @@
 import { headers } from 'next/headers';
 import { SessionProvider } from '@/components/app/session-provider';
 import { getAppConfig } from '@/lib/utils';
-import { VoiceAgentContent } from './voice-agent-content';
 
 export default async function VoiceAgentLayout({ children }: { children: React.ReactNode }) {
   const hdrs = await headers();
@@ -9,7 +8,7 @@ export default async function VoiceAgentLayout({ children }: { children: React.R
 
   return (
     <SessionProvider appConfig={appConfig}>
-      <VoiceAgentContent appConfig={appConfig} />
+      {children}
     </SessionProvider>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { RoomAudioRenderer, StartAudio } from '@livekit/components-react';
 import type { AppConfig } from '@/app-config';
@@ -10,15 +10,19 @@ import { Toaster } from '@/components/livekit/toaster';
 
 export function VoiceAgentContent({ appConfig }: { appConfig: AppConfig }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isSessionActive, startSession, endSession } = useSession();
   const [isInitializing, setIsInitializing] = useState(true);
+
+  // Get leadId from URL params to pass as metadata
+  const leadId = searchParams?.get('leadId') || undefined;
 
   // Auto-start session when page loads
   useEffect(() => {
     if (!isSessionActive) {
-      startSession();
+      startSession(leadId);
     }
-  }, [isSessionActive, startSession]);
+  }, [isSessionActive, startSession, leadId]);
 
   // Show loading screen briefly, then transition to session
   useEffect(() => {
