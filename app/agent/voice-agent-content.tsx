@@ -7,15 +7,17 @@ import type { AppConfig } from '@/app-config';
 import { useSession } from '@/components/app/session-provider';
 import { SessionView } from '@/components/app/session-view';
 import { Toaster } from '@/components/livekit/toaster';
+import { useAgentReady } from '@/hooks/useAgentReady';
 
 export function VoiceAgentContent({ appConfig }: { appConfig: AppConfig }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isSessionActive, startSession, endSession } = useSession();
-  const [isInitializing, setIsInitializing] = useState(true);
 
   // Get leadId from URL params to pass as metadata
   const leadId = searchParams?.get('leadId') || undefined;
+
+  const isAgentReady = useAgentReady();
 
   // Auto-start session when page loads
   useEffect(() => {
@@ -24,17 +26,6 @@ export function VoiceAgentContent({ appConfig }: { appConfig: AppConfig }) {
     }
   }, [isSessionActive, startSession, leadId]);
 
-  // Show loading screen briefly, then transition to session
-  useEffect(() => {
-    if (isSessionActive) {
-      // Small delay to ensure smooth transition
-      const timer = setTimeout(() => {
-        setIsInitializing(false);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [isSessionActive]);
-
   // Handle disconnect - redirect to loading page
   const handleDisconnect = () => {
     endSession();
@@ -42,7 +33,7 @@ export function VoiceAgentContent({ appConfig }: { appConfig: AppConfig }) {
   };
 
   // Show loading screen initially
-  if (isInitializing || !isSessionActive) {
+  if (!isAgentReady || !isSessionActive) {
     return (
       <div className="bg-background text-foreground min-h-screen flex items-center justify-center">
         <div className="text-center space-y-6">
