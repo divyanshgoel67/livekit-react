@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Room, RoomEvent, TokenSource } from 'livekit-client';
 import { AppConfig } from '@/app-config';
 import { toastAlert } from '@/components/livekit/alert-toast';
-import { getConnectionDetails } from '@/network';
+import type { ConnectionDetails } from '@/network';
 
 export function useRoom(appConfig: AppConfig) {
   const aborted = useRef(false);
@@ -40,28 +40,64 @@ export function useRoom(appConfig: AppConfig) {
   const createTokenSource = useCallback(
     (metadata?: string) =>
       TokenSource.custom(async () => {
-        const url = new URL(
-          process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? '/api/connection-details',
-          window.location.origin
-        );
+        if (!metadata) {
+          throw new Error('agentId (metadata) is required');
+        }
+
+        const dialApiEndpoint =
+          process.env.NEXT_PUBLIC_DIAL_API_ENDPOINT ||
+          'https://zr1red2j54.execute-api.ap-south-1.amazonaws.com/dev/calls/dial';
 
         try {
-          return await getConnectionDetails({
-            url: url.toString(),
-            sandboxId: appConfig.sandboxId ?? '',
-            roomConfig: metadata
-              ? {
-                  metadata: metadata,
-                  agents: [{ metadata }],
-                }
-              : undefined,
+          const response = await fetch(dialApiEndpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ agentId: metadata }),
           });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Dial API error:', errorText);
+            throw new Error(`Dial API error: ${response.status} ${errorText}`);
+          }
+
+          const dialData = await response.json();
+          console.log('Dial API response:', dialData);
+
+          // Map dial API response to ConnectionDetails format
+          const connectionDetails: ConnectionDetails = {
+            serverUrl:
+              dialData.serverUrl ||
+              dialData.server ||
+              process.env.NEXT_PUBLIC_LIVEKIT_URL ||
+              '',
+            roomName:
+              dialData.roomName ||
+              dialData.room ||
+              `voice_assistant_room_${Math.floor(Math.random() * 10_000)}`,
+            participantToken: dialData.participantToken || dialData.token,
+            participantName: dialData.participantName || dialData.name || 'user',
+          };
+
+          if (!connectionDetails.participantToken) {
+            throw new Error('participantToken not found in dial API response');
+          }
+
+          if (!connectionDetails.serverUrl) {
+            throw new Error('serverUrl not found in dial API response and NEXT_PUBLIC_LIVEKIT_URL is not set');
+          }
+
+          return connectionDetails;
         } catch (error) {
-          console.error('Error fetching connection details:', error);
-          throw new Error('Error fetching connection details!');
+          console.error('Error calling dial API:', error);
+          throw error instanceof Error
+            ? error
+            : new Error('Error fetching connection details from dial API!');
         }
       }),
-    [appConfig]
+    []
   );
 
   const startSession = useCallback(
@@ -78,6 +114,9 @@ export function useRoom(appConfig: AppConfig) {
         tokenSource
             .fetch({})
           .then((connectionDetails) =>
+            // Connect with the token string
+            // Note: LiveKit server automatically refreshes tokens server-side for connected participants
+            // If reconnection is needed, the tokenSource callback will be called again with the same metadata (agentId)
             room.connect(connectionDetails.serverUrl, connectionDetails.participantToken)
           ),
       ]).catch((error) => {
