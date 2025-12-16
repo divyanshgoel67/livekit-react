@@ -8,10 +8,53 @@ export function useRoom(appConfig: AppConfig) {
   const aborted = useRef(false);
   const room = useMemo(() => new Room(), []);
   const [isSessionActive, setIsSessionActive] = useState(false);
+  const currentCallIdRef = useRef<string | undefined>(undefined);
+
+  // Helper function to call the end call API
+  const callEndCallAPI = useCallback(async (callId: string, context: string = '') => {
+    try {
+      const baseEndpoint = 
+        process.env.NEXT_PUBLIC_END_CALL_API_ENDPOINT ||
+        `https://zr1red2j54.execute-api.ap-south-1.amazonaws.com/dev/calls`;
+      const endCallApiEndpoint = `${baseEndpoint}/${callId}/end`;
+      
+      const jwtToken = process.env.NEXT_PUBLIC_JWT_TOKEN;
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      // Add Authorization header if JWT token is provided
+      if (jwtToken) {
+        headers['Authorization'] = `Bearer ${jwtToken}`;
+      }
+
+      const response = await fetch(endCallApiEndpoint, {
+        method: 'POST',
+        headers,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`End call API error${context ? ` (${context})` : ''}:`, errorText);
+      } else {
+        console.log(`Call ended successfully via API${context ? ` (${context})` : ''}`);
+      }
+    } catch (error) {
+      console.error(`Error calling end call API${context ? ` (${context})` : ''}:`, error);
+    }
+  }, []);
 
   useEffect(() => {
-    function onDisconnected() {
+    async function onDisconnected() {
       setIsSessionActive(false);
+      
+      // Call the end call API if callId is available
+      const callId = currentCallIdRef.current;
+      if (callId) {
+        await callEndCallAPI(callId, 'on disconnect');
+        // Clear the callId reference
+        currentCallIdRef.current = undefined;
+      }
     }
 
     function onMediaDevicesError(error: Error) {
@@ -28,7 +71,7 @@ export function useRoom(appConfig: AppConfig) {
       room.off(RoomEvent.Disconnected, onDisconnected);
       room.off(RoomEvent.MediaDevicesError, onMediaDevicesError);
     };
-  }, [room]);
+  }, [room, callEndCallAPI]);
 
   useEffect(() => {
     return () => {
@@ -65,6 +108,12 @@ export function useRoom(appConfig: AppConfig) {
 
           const dialData = await response.json();
           console.log('Dial API response:', dialData);
+
+          // Extract callId from the dial API response
+          const callId = dialData.callId || dialData.call_id;
+          if (callId) {
+            currentCallIdRef.current = callId;
+          }
 
           // Map dial API response to ConnectionDetails format
           const connectionDetails: ConnectionDetails = {
@@ -139,9 +188,22 @@ export function useRoom(appConfig: AppConfig) {
     [room, appConfig, createTokenSource]
   );
 
-  const endSession = useCallback(() => {
+  const endSession = useCallback(async () => {
     setIsSessionActive(false);
-  }, []);
+    
+    // Call the end call API if callId is available
+    const callId = currentCallIdRef.current;
+    if (callId) {
+      await callEndCallAPI(callId, 'end session');
+      // Clear the callId reference
+      currentCallIdRef.current = undefined;
+    }
+    
+    // Disconnect from the room
+    if (room.state !== 'disconnected') {
+      room.disconnect();
+    }
+  }, [room, callEndCallAPI]);
 
   return { room, isSessionActive, startSession, endSession };
 }
