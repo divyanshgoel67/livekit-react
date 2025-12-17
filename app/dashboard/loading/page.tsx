@@ -1,8 +1,37 @@
 'use client';
 
-import React from 'react';
+import { useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
 export default function LoadingPage() {
+  const [status, setStatus] = useState<string>('processing');
+  const searchParams = useSearchParams()
+  const callId = searchParams.get('callId');
+
+  useEffect(() => {
+    const pollApi = async () => {
+      try {
+        const response = await fetch('https://zr1red2j54.execute-api.ap-south-1.amazonaws.com/dev/calls/' + callId);
+        const data = await response.json();
+        
+        setStatus(data.status);
+        
+        if (data.status === 'completed') {
+          // Redirect to transcript URL for download
+          const response = await fetch('https://zr1red2j54.execute-api.ap-south-1.amazonaws.com/dev/calls/' + callId +'/transcript');
+          const data = await response.json();
+          window.location.href = data.downloadUrl;
+        }
+      } catch (error) {
+        console.error('Polling error:', error);
+      }
+    };
+
+    const intervalId = setInterval(pollApi, 5000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center">
       <div className="text-center space-y-6">
@@ -17,4 +46,3 @@ export default function LoadingPage() {
     </div>
   );
 }
-

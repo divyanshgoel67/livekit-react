@@ -9,6 +9,7 @@ export function useRoom(appConfig: AppConfig) {
   const room = useMemo(() => new Room(), []);
   const [isSessionActive, setIsSessionActive] = useState(false);
   const currentCallIdRef = useRef<string | undefined>(undefined);
+  const getCallId = useCallback(() => currentCallIdRef.current, []);
 
   // Helper function to call the end call API
   const callEndCallAPI = useCallback(async (callId: string, context: string = '') => {
@@ -205,5 +206,5 @@ export function useRoom(appConfig: AppConfig) {
     }
   }, [room, callEndCallAPI]);
 
-  return { room, isSessionActive, startSession, endSession };
+  return { room, isSessionActive, startSession, endSession, getCallId };
 }

@@ -12,7 +12,7 @@ import { useAgentReady } from '@/hooks/useAgentReady';
 export function VoiceAgentContent({ appConfig }: { appConfig: AppConfig }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isSessionActive, startSession, endSession } = useSession();
+  const { isSessionActive, startSession, endSession, getCallId } = useSession();
 
   // Get leadId from URL params to pass as metadata
   const leadId = searchParams?.get('leadId') || undefined;
@@ -28,10 +28,14 @@ export function VoiceAgentContent({ appConfig }: { appConfig: AppConfig }) {
     }
   }, [isSessionActive, startSession, leadId]);
 
-  // Handle disconnect - redirect to loading page
   const handleDisconnect = () => {
     endSession();
-    router.push('/dashboard/loading');
+    const callId = getCallId()
+    if (callId) {
+      router.push(`/dashboard/loading?callId=${callId}`);
+    } else {
+      router.push('/dashboard/loading');
+    }
   };
 
   // Show loading screen initially
