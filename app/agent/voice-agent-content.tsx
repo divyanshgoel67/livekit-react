@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { RoomAudioRenderer, StartAudio } from '@livekit/components-react';
 import type { AppConfig } from '@/app-config';
 import { useSession } from '@/components/app/session-provider';
@@ -18,10 +18,12 @@ export function VoiceAgentContent({ appConfig }: { appConfig: AppConfig }) {
   const leadId = searchParams?.get('leadId') || undefined;
 
   const isAgentReady = useAgentReady();
+  const hasAttemptedStartRef = useRef(false);
 
   // Auto-start session when page loads
   useEffect(() => {
-    if (!isSessionActive) {
+    if (!isSessionActive && !hasAttemptedStartRef.current) {
+      hasAttemptedStartRef.current = true;
       startSession(leadId);
     }
   }, [isSessionActive, startSession, leadId]);
