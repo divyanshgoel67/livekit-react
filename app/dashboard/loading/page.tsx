@@ -14,13 +14,13 @@ export default function LoadingPage() {
   useEffect(() => {
     const pollApi = async () => {
       try {
-        const response = await fetch('https://zr1red2j54.execute-api.ap-south-1.amazonaws.com/dev/calls/' + callId);
+        const response = await fetch('https://olzttsjp85.execute-api.ap-south-1.amazonaws.com/dev/core/calls/' + callId);
         const data = await response.json();
         
         setStatus(data.status);
         
         if (data.status === 'completed') {
-          const transcriptResponse = await fetch('https://zr1red2j54.execute-api.ap-south-1.amazonaws.com/dev/calls/' + callId + '/transcript');
+          const transcriptResponse = await fetch('https://olzttsjp85.execute-api.ap-south-1.amazonaws.com/dev/core/calls/' + callId + '/transcript');
           const transcriptData = await transcriptResponse.json();
           setTranscript(transcriptData.transcript);
           setCallMetrics(transcriptData.callMetrics);

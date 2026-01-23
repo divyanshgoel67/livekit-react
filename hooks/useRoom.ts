@@ -16,7 +16,7 @@ export function useRoom(appConfig: AppConfig) {
     try {
       const baseEndpoint = 
         process.env.NEXT_PUBLIC_END_CALL_API_ENDPOINT ||
-        `https://zr1red2j54.execute-api.ap-south-1.amazonaws.com/dev/calls`;
+        `https://olzttsjp85.execute-api.ap-south-1.amazonaws.com/dev/core/calls`;
       const endCallApiEndpoint = `${baseEndpoint}/${callId}/end`;
       
       const jwtToken = process.env.NEXT_PUBLIC_JWT_TOKEN;
@@ -90,7 +90,7 @@ export function useRoom(appConfig: AppConfig) {
 
         const dialApiEndpoint =
           process.env.NEXT_PUBLIC_DIAL_API_ENDPOINT ||
-          'https://zr1red2j54.execute-api.ap-south-1.amazonaws.com/dev/calls/dial';
+          'https://olzttsjp85.execute-api.ap-south-1.amazonaws.com/dev/core/calls/dial';
 
         try {
           const response = await fetch(dialApiEndpoint, {
