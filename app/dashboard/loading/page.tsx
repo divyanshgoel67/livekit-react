@@ -1,5 +1,7 @@
 'use client';
 
+import { CallTranscriptResponse } from '@/network/models/room';
+import { getCallStatus, getCallTranscript } from '@/network/room-api';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState, useRef } from 'react';
 
@@ -14,16 +16,23 @@ export default function LoadingPage() {
   useEffect(() => {
     const pollApi = async () => {
       try {
-        const response = await fetch('https://olzttsjp85.execute-api.ap-south-1.amazonaws.com/dev/core/calls/' + callId);
-        const data = await response.json();
+        if (!callId) {
+          return;
+        }
+        const callStatus = await getCallStatus(callId)
+        if (!callStatus) {
+          return;
+        }
+      
+        setStatus(callStatus.status);
         
-        setStatus(data.status);
-        
-        if (data.status === 'completed') {
-          const transcriptResponse = await fetch('https://olzttsjp85.execute-api.ap-south-1.amazonaws.com/dev/core/calls/' + callId + '/transcript');
-          const transcriptData = await transcriptResponse.json();
-          setTranscript(transcriptData.transcript);
-          setCallMetrics(transcriptData.callMetrics);
+        if (callStatus.status === 'completed') {
+          const callTranscriptData = await getCallTranscript(callId);
+          if (!callTranscriptData) {
+            return;
+          }
+          setTranscript(callTranscriptData.transcript);
+          setCallMetrics(callTranscriptData.callMetrics);
           if (intervalRef.current) {
             clearInterval(intervalRef.current);
           }

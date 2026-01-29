@@ -3,6 +3,8 @@ import { Room, RoomEvent, TokenSource } from 'livekit-client';
 import { AppConfig } from '@/app-config';
 import { toastAlert } from '@/components/livekit/alert-toast';
 import type { ConnectionDetails } from '@/network';
+import { endRoom, startRoom } from '@/network/room-api';
+import { CallEndParams, CallStartRequestParams, CallStartResponse } from '@/network/models/room';
 
 export function useRoom(appConfig: AppConfig) {
   const aborted = useRef(false);
@@ -13,42 +15,19 @@ export function useRoom(appConfig: AppConfig) {
 
   // Helper function to call the end call API
   const callEndCallAPI = useCallback(async (callId: string, context: string = '') => {
+
     try {
-      const baseEndpoint = 
-        process.env.NEXT_PUBLIC_END_CALL_API_ENDPOINT ||
-        `https://olzttsjp85.execute-api.ap-south-1.amazonaws.com/dev/core/calls`;
-      const endCallApiEndpoint = `${baseEndpoint}/${callId}/end`;
-      
-      const jwtToken = process.env.NEXT_PUBLIC_JWT_TOKEN;
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
-      
-      // Add Authorization header if JWT token is provided
-      if (jwtToken) {
-        headers['Authorization'] = `Bearer ${jwtToken}`;
-      }
-
-      const response = await fetch(endCallApiEndpoint, {
-        method: 'POST',
-        headers,
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`End call API error${context ? ` (${context})` : ''}:`, errorText);
-      } else {
-        console.log(`Call ended successfully via API${context ? ` (${context})` : ''}`);
-      }
+      const callEndParams = { callId } as CallEndParams
+      endRoom(callEndParams)
     } catch (error) {
-      console.error(`Error calling end call API${context ? ` (${context})` : ''}:`, error);
+      console.error(`Error calling end call API:, ${error}`);
     }
   }, []);
 
   useEffect(() => {
     async function onDisconnected() {
       setIsSessionActive(false);
-      
+
       // Call the end call API if callId is available
       const callId = currentCallIdRef.current;
       if (callId) {
@@ -87,64 +66,37 @@ export function useRoom(appConfig: AppConfig) {
         if (!metadata) {
           throw new Error('agentId (metadata) is required');
         }
-
-        const dialApiEndpoint =
-          process.env.NEXT_PUBLIC_DIAL_API_ENDPOINT ||
-          'https://olzttsjp85.execute-api.ap-south-1.amazonaws.com/dev/core/calls/dial';
-
         try {
-          const response = await fetch(dialApiEndpoint, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ agentId: metadata }),
-          });
+          const params : CallStartRequestParams = {
+            agentId: metadata
+          }
+          const startRoomResponse = await startRoom(params)
 
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Dial API error:', errorText);
-            throw new Error(`Dial API error: ${response.status} ${errorText}`);
+          if (!startRoomResponse) {
+            console.error('Invalid call start response');
+            throw new Error('Invalid response');
           }
 
-          const dialData = await response.json();
-          console.log('Dial API response:', dialData);
+          const dialData = startRoomResponse as CallStartResponse
 
-          // Extract callId from the dial API response
-          const callId = dialData.callId || dialData.call_id;
+          if (!dialData.serverUrl || !dialData.participantToken) {
+            console.error('Invalid call start response');
+            throw new Error('Invalid response');
+          }
+          const callId = dialData.callId;
           if (callId) {
             currentCallIdRef.current = callId;
           }
-
-          // Map dial API response to ConnectionDetails format
           const connectionDetails: ConnectionDetails = {
-            serverUrl:
-              dialData.serverUrl ||
-              dialData.server ||
-              process.env.NEXT_PUBLIC_LIVEKIT_URL ||
-              '',
-            roomName:
-              dialData.roomName ||
-              dialData.room ||
-              `voice_assistant_room_${Math.floor(Math.random() * 10_000)}`,
-            participantToken: dialData.participantToken || dialData.token,
-            participantName: dialData.participantName || dialData.name || 'user',
+            serverUrl: dialData.serverUrl,
+            roomName: dialData.roomName,
+            participantToken: dialData.participantToken,
+            participantName: dialData.participantName
           };
-
-          if (!connectionDetails.participantToken) {
-            throw new Error('participantToken not found in dial API response');
-          }
-
-          if (!connectionDetails.serverUrl) {
-            throw new Error('serverUrl not found in dial API response and NEXT_PUBLIC_LIVEKIT_URL is not set');
-          }
-
           return connectionDetails;
         } catch (error) {
+           throw new Error(`Error while creating room: ${error}`);
           console.error('Error calling dial API:', error);
-          throw error instanceof Error
-            ? error
-            : new Error('Error fetching connection details from dial API!');
         }
       }),
     []
@@ -152,46 +104,46 @@ export function useRoom(appConfig: AppConfig) {
 
   const startSession = useCallback(
     (metadata?: string) => {
-    setIsSessionActive(true);
+      setIsSessionActive(true);
 
-    if (room.state === 'disconnected') {
-      const { isPreConnectBufferEnabled } = appConfig;
+      if (room.state === 'disconnected') {
+        const { isPreConnectBufferEnabled } = appConfig;
         const tokenSource = createTokenSource(metadata);
-      Promise.all([
-        room.localParticipant.setMicrophoneEnabled(true, undefined, {
-          preConnectBuffer: isPreConnectBufferEnabled,
-        }),
-        tokenSource
+        Promise.all([
+          room.localParticipant.setMicrophoneEnabled(true, undefined, {
+            preConnectBuffer: isPreConnectBufferEnabled,
+          }),
+          tokenSource
             .fetch({})
-          .then((connectionDetails) =>
-            // Connect with the token string
-            // Note: LiveKit server automatically refreshes tokens server-side for connected participants
-            // If reconnection is needed, the tokenSource callback will be called again with the same metadata (agentId)
-            room.connect(connectionDetails.serverUrl, connectionDetails.participantToken)
-          ),
-      ]).catch((error) => {
-        if (aborted.current) {
-          // Once the effect has cleaned up after itself, drop any errors
-          //
-          // These errors are likely caused by this effect rerunning rapidly,
-          // resulting in a previous run `disconnect` running in parallel with
-          // a current run `connect`
-          return;
-        }
+            .then((connectionDetails) =>
+              // Connect with the token string
+              // Note: LiveKit server automatically refreshes tokens server-side for connected participants
+              // If reconnection is needed, the tokenSource callback will be called again with the same metadata (agentId)
+              room.connect(connectionDetails.serverUrl, connectionDetails.participantToken)
+            ),
+        ]).catch((error) => {
+          if (aborted.current) {
+            // Once the effect has cleaned up after itself, drop any errors
+            //
+            // These errors are likely caused by this effect rerunning rapidly,
+            // resulting in a previous run `disconnect` running in parallel with
+            // a current run `connect`
+            return;
+          }
 
-        toastAlert({
-          title: 'There was an error connecting to the agent',
-          description: `${error.name}: ${error.message}`,
+          toastAlert({
+            title: 'There was an error connecting to the agent',
+            description: `${error.name}: ${error.message}`,
+          });
         });
-      });
-    }
+      }
     },
     [room, appConfig, createTokenSource]
   );
 
   const endSession = useCallback(async () => {
     setIsSessionActive(false);
-    
+
     // Call the end call API if callId is available
     const callId = currentCallIdRef.current;
     if (callId) {
@@ -199,7 +151,7 @@ export function useRoom(appConfig: AppConfig) {
       // Clear the callId reference
       currentCallIdRef.current = undefined;
     }
-    
+
     // Disconnect from the room
     if (room.state !== 'disconnected') {
       room.disconnect();

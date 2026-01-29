@@ -36,9 +36,14 @@ export function createAxiosClient(baseURL?: string): AxiosInstance {
 }
 
 /**
+ * Get the base URL from the enviromnemt
+ */
+const baseUrl = process.env.NEXT_PUBLIC_BASE_END_POINT || ""
+
+/**
  * Default axios client instance
  */
-export const apiClient = createAxiosClient();
+export const apiClient = createAxiosClient(baseUrl);
 
 /**
  * Helper to check if an error is an Axios error
