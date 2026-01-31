@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { LeadCard } from './lead-card';
 import { LeadCardShimmer } from './shimmer';
-import { getRecommendedLeads, getFavoriteLeads, type Lead } from '@/network/leads-api';
+import { getRecommendedLeads, getFavoriteLeads } from '@/network/leads-api';
+import { Lead } from '@/network/models/agent';
 
 const LeadsSection = ({ onLeadClick, onViewAll }: { onLeadClick: (lead: any) => void, onViewAll: () => void }) => {
   const [isLoadingRecommended, setIsLoadingRecommended] = useState(true);
@@ -19,7 +20,7 @@ const LeadsSection = ({ onLeadClick, onViewAll }: { onLeadClick: (lead: any) => 
         // TODO: Replace with actual API endpoint when available
         // For now, using mock data fallback
         const leads = await getRecommendedLeads();
-        setRecommended(leads);
+        setRecommended(leads ?? []);
       } catch (error) {
         console.error('Error fetching recommended leads:', error);
         // Fallback to empty array on error
@@ -36,7 +37,7 @@ const LeadsSection = ({ onLeadClick, onViewAll }: { onLeadClick: (lead: any) => 
         // TODO: Replace with actual API endpoint when available
         // For now, using mock data fallback
         const leads = await getFavoriteLeads();
-        setFavorites(leads);
+        setFavorites(leads ?? []);
       } catch (error) {
         console.error('Error fetching favorite leads:', error);
         // Fallback to empty array on error

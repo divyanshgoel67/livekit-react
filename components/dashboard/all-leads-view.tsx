@@ -5,7 +5,8 @@ import { ArrowLeft, Search, Filter } from 'lucide-react';
 import { LeadCard } from './lead-card';
 import { LeadCardShimmer } from './shimmer';
 import FilterSidebar from './filter-sidebar';
-import { getLeads, type Lead } from '@/network/leads-api';
+import { getLeads } from '@/network/leads-api';
+import { Lead } from '@/network/models/agent';
 
 interface AllLeadsViewProps {
   onBack: () => void;
@@ -38,7 +39,7 @@ const AllLeadsView = ({ onBack, onLeadClick }: AllLeadsViewProps) => {
           maxDealValue: filters.maxDealValue || undefined,
           personas: filters.personas,
         });
-        setAllLeads(leads);
+        setAllLeads(leads ?? []);
       } catch (error) {
         console.error('Error fetching leads:', error);
         // Fallback to empty array on error
